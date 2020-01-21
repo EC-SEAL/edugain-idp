@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+        <meta charset="utf-8"></meta>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+        <meta name="description" content=""></meta>
+        <meta name="author" content=""></meta>
+        <title>Provide additional data</title>
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css"></link>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+        <link rel="stylesheet" href="../css/main.css"></link>
+        <link rel="icon"
+              type="image/x-icon"
+              href="favicon.ico"></link>
+
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+        <!-- Overide the sidebar css -->
+        <style>
+            .sideBarClass{
+                margin-top: 0;
+            }
+
+            .breadCrumbs{
+                font-size: 18px;
+                color:  #00be9f;
+                padding-left: 0px;
+            }
+        </style>
+    </head>
+    <body>
+
+
+        <div th:replace="header :: header">Header</div>
+
+        <div class="container">
+
+            <div class="row  mainContent">
+
+                <div class="col s12 m12 l12">
+
+                    <div class="container" style="width: 90%;">
+
+
+
+                        <div class="row instructions">
+                            <div   class="col s12 ">
+                                <div class="row">
+                                    <p  class="col s12">
+                                        <b>Transfer your Academic Attributes</b>: You will now be directed to GR Academic ID Service (Ministry of Education) to identify and 
+                                        provide to Requesting Party the demanded academic attributes. To successfully identify please enter your personal AMKA number (The AMKA,
+                                        the Greek Social Security number, is the work and insurance ID for every employee, pensioner and dependent member of a 
+                                        family living in Greece. Find your AMKA <a href="http://www.amka.gr/" target="_blank">HERE!</a>). 
+                                    </p>
+                                    <p class="col s12">But first, select the University you are affiliated.     </p>  
+                                </div>
+
+                                <form  id="amkaForm" th:action="@{../ap/forward}" th:object="${amka}" method="post"  commandName="amka">
+
+                                    <i style="color:red" th:if="${#fields.hasErrors('code')}" th:errors="*{code}">A.M.K.A is required!</i>
+                                    <div class="row">
+                                        <div class="input-field col l8 s12">
+                                            <select id="universities" class="icons" th:field="*{code}" >
+                                                <option value="" disabled selected="true">Choose your option</option>
+                                                <th:block th:each="university : ${universities}">
+                                                    <!--<option th:value="${university.code}" th:text="${#strings.toUpperCase(university.name)}"></option>-->
+                                                    <div th:switch="${university.code}"> 
+                                                        <option th:case="999840693"   th:value="${university.code}" th:text="${#strings.toUpperCase(university.name)}"></option>
+                                                        <option th:case="*"  th:value="${university.code}" th:text="${#strings.toUpperCase(university.name)}"></option>
+                                                    </div>
+                                                </th:block>
+                                            </select>
+                                            <label th:text="#{select}">Select Your University of Origin</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <i style="color:red" th:if="${#fields.hasErrors('amkaNumber')}" th:errors="*{amkaNumber}">A.M.K.A is required!</i>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col l1 s12" for="amka" th:text="#{amka}"></label>
+                                        <input class="col l7 s12" type="text" id="amka" th:field="*{amkaNumber}" /> 
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <label class="col l1 s12" for="academicId" th:text="#{academicId}"></label>
+                                        <input class="col l7 s12" id="academicId" type="text" th:field="*{academicId}" /> </p>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="g-recaptcha col-sm-5"
+                                             th:attr="data-sitekey=${@captchaSettings.getSite()}"></div>
+                                        <span id="captchaError" class="alert alert-danger col-sm-4"
+                                              style="display:none"></span>
+                                    </div>
+
+                                    <input type="hidden" name="sessionId" th:field="*{sessionId}" th:value="${amka.sessionId}"/>
+                                    
+                                    <div class="row" id="buttons">
+                                        <button type="button" onclick="onCancelClick()" class="col s12 m4 l4 waves-effect waves-light btn-large swell-btn cancel-btn" style="margin-right: 2em;">
+                                            Cancel
+                                        </button>
+                                        <button  type="button" onclick="onSubmit()" class= "col s12 m4 l4 waves-effect waves-light btn-large swell-btn next-btn" value="Submit">Submit</button>
+                                    </div>
+                                    
+                                    <div class="row" id="preloader" style="display:none">
+                                        <div class="progress">
+                                            <div class="indeterminate"></div>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+
+
+                <!--                <div class="col s12 m12 l2">
+                                    <div   th:replace="sidebar :: sidebar"></div>
+                                </div>-->
+
+            </div>
+            <div class="row" th:replace="footer :: footer"></div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+       <!--Import jQuery before materialize.js-->
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+            
+        <script th:inline="javascript">
+                                            /*<![CDATA[*/
+                                            $(document).ready(function () {
+
+
+                                                $('select').material_select();
+                                                $('.modal').modal();
+                                                function register(event) {
+                                                    event.preventDefault();
+                                                    let formData = $('form').serialize();
+                                                }
+                                                function langGR() {
+                                                    window.location.href = 'login?localeCode=gr';
+                                                }
+                                                function langEN() {
+                                                    window.location.href = 'login?localeCode=en';
+                                                }
+
+
+
+
+                                            });
+
+                                            function onCancelClick() {
+                                                let sessionId = document.getElementById("sessionId").value;
+                                                window.location = "/ap/proceedAfterError?sessionId=" + sessionId;
+                                            }
+                                            
+                                            
+                                           function onSubmit(){
+                                               console.log("clicked submit");
+                                               let amkaForm = document.getElementById("amkaForm");
+                                               let  buttons = document.getElementById("buttons");
+                                               let  preloader = document.getElementById("preloader");
+                                               
+                                               buttons.style.display = "none";
+                                               preloader.style.display = "block";
+                                               amkaForm.submit();
+                                               
+                                           }
+                                            
+
+                                            /*]]>*/
+        </script>
+
+    </body>
+</html>
+
+
