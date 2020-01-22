@@ -119,7 +119,7 @@ public class ASControllers {
 					redirectAttrs.addFlashAttribute("errorMsg", "No AP request attributes found in the Session! Please restart the process");
 					return "redirect:/authfail";
 				} else {
-					return "redirect:/grap/saml/login?session=" + sealSessionId;
+					return "redirect:/saml/login?session=" + sealSessionId;
 				}
 			} else {
 				model.addAttribute("error", "Error validating token! " + resp.getError());
