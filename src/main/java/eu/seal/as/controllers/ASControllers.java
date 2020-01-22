@@ -174,12 +174,13 @@ public class ASControllers {
 				"sn", "schGrAcPersonalLinkageID", "givenName;lang-el",
 				"displayName", "mobile", "givenName", "cn"
 		);
-
+		String callbackOriginURL = System.getenv("CALLBACK_ORIGIN_URL");
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
 		List<NameValuePair> requestParams = new ArrayList<>();
 		ObjectMapper mapper = new ObjectMapper();
 		SessionMngrResponse resp = mapper.readValue(session, SessionMngrResponse.class);
 		String sealSessionId = resp.getSessionData().getSessionId();
+		
 
 		List<Attribute> returnedAttributes
 		= attributes.stream()
@@ -199,13 +200,11 @@ public class ASControllers {
 		LOG.info(result.toString());
 		
 		// Create Dataset
-		
-		
-		
-		
 		// Create Datastore
 		
-		return "redirect:/authfail";
+		
+		
+		return "redirect:" + callbackOriginURL;
 	}
 
 }
