@@ -73,6 +73,7 @@ public class KeyStoreServiceImpl implements KeyStoreService {
             return keystore.getKey(httpSigKeyAlias, keyPass.toCharArray());
         }
         String secretKey = paramServ.getParam("SIGNING_SECRET");
+        System.out.print("This is the signing secret" + secretKey);
         return new SecretKeySpec(secretKey.getBytes("UTF-8"), 0, secretKey.length(), "HmacSHA256");
     }
 

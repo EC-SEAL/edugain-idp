@@ -229,7 +229,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
 //        metadataGenerator.setEntityId("APP_ENTITY_ID"); // esmoSamlClient
-        metadataGenerator.setEntityId("esmoSamlClient"); //
+        metadataGenerator.setEntityId("sealSamlClient"); //
 //        metadataGenerator.setEntityBaseURL("APP_BASE_URL");
 //        metadataGenerator.setEntityBaseURL("localhost:8080");
 //System.getenv(paramName)
@@ -383,7 +383,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
 
         Timer backgroundTaskTimer = new Timer(true);
 //        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "http://localhost:8081/auth/realms/master/protocol/saml/descriptor");
-        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "http://idp.oktadev.com/metadata");
+        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml");
         httpMetadataProvider.setParserPool(parserPool());
 
         ExtendedMetadataDelegate extendedMetadataDelegate
