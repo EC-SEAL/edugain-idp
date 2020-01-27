@@ -34,7 +34,6 @@ public class SamlWithRelayStateEntryPoint extends SAMLEntryPoint {
         String apSession = httpServletRequestAdapter.getParameterValue("session");
 
         if (apSession != null) {
-        	log.info("Bitconnect!");
             ssoProfileOptions.setRelayState("/grap/saml/ap/samlSuccess?session=" + apSession);
         }
 
