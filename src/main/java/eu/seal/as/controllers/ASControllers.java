@@ -174,6 +174,9 @@ public class ASControllers {
 				"sn", "schGrAcPersonalLinkageID", "givenName;lang-el",
 				"displayName", "mobile", "givenName", "cn"
 		);
+		
+		LOG.info("************************************************************************************************************************************************************************************************************************************************************************************************************************************\n \n *****************************************************************************************************");
+		
 		String callbackOriginURL = System.getenv("CALLBACK_ORIGIN_URL");
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
 		List<NameValuePair> requestParams = new ArrayList<>();

@@ -30,6 +30,6 @@ export MINEDU_QUERYID_URL=https://gateway.interoperability.es/academicId/1.0.1/q
 export MINEDU_QUERY_BY_AMKA=https://gateway.interoperability.es/academicId/1.0.1/student
 export MINEDU_TOKEN_URL=https://validation.interoperability.es:9443/OAUTH2Proxy_1.0.0/services/oauthproxy/authorization/token
 export UNIVERSITIES_CONFIG_PATH=/resources/university_codes.json
-export APP_BASE_URL=https://0900b3a5.ngrok.io
+export APP_BASE_URL=http://localhost:8080
 export TESTING=true
 

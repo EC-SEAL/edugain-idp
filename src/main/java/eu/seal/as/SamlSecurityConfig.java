@@ -138,7 +138,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public WebSSOProfileOptions defaultWebSSOProfileOptions() {
         WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
 
-        webSSOProfileOptions.setRelayState("https://mywebsite"); // ????
+        //webSSOProfileOptions.setRelayState("https://mywebsite"); // ????
         webSSOProfileOptions.setIncludeScoping(false);
         return webSSOProfileOptions;
     }
@@ -170,6 +170,9 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
 //        successRedirectHandler.setTargetUrlParameter("session");
 
         successRedirectHandler.setDefaultTargetUrl("/as/samlSuccess");
+        
+        System.out.println("\n \n *********************************SETTING PROCESSING FILTER************************************* \n \n \n"  + successRedirectHandler.toString() );
+
 
         return successRedirectHandler;
     }
@@ -182,7 +185,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public SAMLProcessingFilter samlWebSSOProcessingFilter() throws Exception {
         SAMLProcessingFilter samlWebSSOProcessingFilter = new SAMLProcessingFilter();
         samlWebSSOProcessingFilter.setAuthenticationManager(authenticationManager());
-        System.out.println(authenticationManager());
+        System.out.println("\\n \\n \\n *********************************SETTING PROCESSING FILTER************************************* \n \n \n");
         samlWebSSOProcessingFilter.setAuthenticationSuccessHandler(successRedirectHandler());
         samlWebSSOProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
         return samlWebSSOProcessingFilter;
@@ -192,7 +195,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public SimpleUrlLogoutSuccessHandler successLogoutHandler() {
         SimpleUrlLogoutSuccessHandler simpleUrlLogoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
-        simpleUrlLogoutSuccessHandler.setDefaultTargetUrl("/");
+        simpleUrlLogoutSuccessHandler.setDefaultTargetUrl("/error");
         simpleUrlLogoutSuccessHandler.setAlwaysUseDefaultTargetUrl(true);
         return simpleUrlLogoutSuccessHandler;
     }
@@ -229,7 +232,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
 //        metadataGenerator.setEntityId("APP_ENTITY_ID"); // esmoSamlClient
-        metadataGenerator.setEntityId("sealSamlClient"); //
+        metadataGenerator.setEntityId("saml-test"); //
 //        metadataGenerator.setEntityBaseURL("APP_BASE_URL");
 //        metadataGenerator.setEntityBaseURL("localhost:8080");
 //System.getenv(paramName)
@@ -382,8 +385,8 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
             throws MetadataProviderException, ResourceException {
 
         Timer backgroundTaskTimer = new Timer(true);
-//        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "http://localhost:8081/auth/realms/master/protocol/saml/descriptor");
-        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml");
+        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "http://localhost:8081/auth/realms/master/protocol/saml/descriptor");
+//        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new HttpClient(), "https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml");
         httpMetadataProvider.setParserPool(parserPool());
 
         ExtendedMetadataDelegate extendedMetadataDelegate
