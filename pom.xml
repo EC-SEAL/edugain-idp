@@ -6,9 +6,9 @@
     <version>2.2.1.RELEASE</version>
     <packaging>jar</packaging>
     <!-- Project description -->
-    <name>Spring Boot sample SAML 2.0 Service Provider</name>
-    <description>A sample SAML 2.0 Service Provider built on Spring Boot.</description>
-    <url>https://github.com/vdenotaris/spring-boot-security-saml-sample</url>
+    <name>Seal Edugain IDP connector</name>
+    <description>Connects Seal to an Edugain idp provider via SAML</description>
+    <url>https://github.com/EC-SEAL</url>
     <developers>
         <developer>
             <id>Atos</id>
@@ -17,12 +17,6 @@
             <timezone>CET/CEST</timezone>
         </developer>
     </developers>
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-        </license>
-    </licenses>
     <inceptionYear>2020</inceptionYear>
     <properties>
         <java.version>1.8</java.version>
@@ -130,11 +124,6 @@
             <version>3.2.2</version>
         </dependency>
     </dependencies>
-    <scm>
-        <connection>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</connection>
-        <url>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</url>
-        <developerConnection>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</developerConnection>
-    </scm>
     <build>
         <plugins>
             <plugin>
