@@ -3,7 +3,7 @@ package eu.seal.idp.service.impl;
 import eu.seal.idp.model.pojo.EndpointType;
 import eu.seal.idp.model.pojo.EntityMetadata;
 import eu.seal.idp.model.pojo.SecurityKeyType;
-import eu.seal.idp.service.EsmoMetadataService;
+import eu.seal.idp.service.SealMetadataService;
 import eu.seal.idp.service.KeyStoreService;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class EsmoMetadataServiceImpl implements EsmoMetadataService {
+public class SealMetadataServiceImpl implements SealMetadataService {
 
     private final KeyStoreService keyServ;
     private final HashMap<String, String> displayNames;
@@ -27,7 +27,7 @@ public class EsmoMetadataServiceImpl implements EsmoMetadataService {
     private final EndpointType[] endpoints;
 
     @Autowired
-    public EsmoMetadataServiceImpl(KeyStoreService keyServ) throws KeyStoreException, UnsupportedEncodingException {
+    public SealMetadataServiceImpl(KeyStoreService keyServ) throws KeyStoreException, UnsupportedEncodingException {
         this.keyServ = keyServ;
 
         displayNames = new HashMap();

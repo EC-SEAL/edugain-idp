@@ -6,7 +6,7 @@ import java.security.KeyStoreException;
 import eu.seal.idp.model.pojo.EntityMetadata;
 
 
-public interface EsmoMetadataService {
+public interface SealMetadataService {
     
     public EntityMetadata getMetadata() throws IOException, KeyStoreException;
 

@@ -30,7 +30,7 @@ import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.model.pojo.UpdateDataRequest;
-import eu.seal.idp.service.EsmoMetadataService;
+import eu.seal.idp.service.SealMetadataService;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.KeyStoreService;
 import eu.seal.idp.service.NetworkService;
@@ -49,7 +49,7 @@ public class CallbackController {
 	
 	@Autowired
 	public CallbackController(KeyStoreService keyServ,
-			EsmoMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
+			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		Key signingKey = this.keyServ.getSigningKey();
 		String fingerPrint = this.keyServ.getFingerPrint();
