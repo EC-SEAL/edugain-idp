@@ -9,20 +9,10 @@ import org.opensaml.xml.schema.impl.XSStringImpl;
 
 import eu.seal.idp.model.pojo.AttributeType;
 
-/**
- *
- * @author nikos
- */
+
 public class AttributeTypeFactory {
 
-    /*
-     private String name;
-    private String friendlyName;
-    private String encoding;
-    private String language;
-    private boolean isMandatory;
-    private String[] values;
-     */
+
     public static AttributeType[] makeFromSamlAttribute(List<Attribute> attributes) {
         AttributeType[] result = new AttributeType[attributes.size()];
         return attributes.stream().map(attr -> {
@@ -31,7 +21,6 @@ public class AttributeTypeFactory {
             type.setFriendlyName(attr.getFriendlyName());
             type.setIsMandatory(true);
             type.setLanguage("en");
-//            type.setName(attr.getName()); leave name null because they do not match...
 
             if (attr.getAttributeValues().get(0) instanceof XSStringImpl) {
                 type.setValues(new String[]{((XSStringImpl) attr.getAttributeValues().get(0)).getValue()});

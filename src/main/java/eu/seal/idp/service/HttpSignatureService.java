@@ -13,10 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import eu.seal.idp.enums.HttpResponseEnum;
 
-/**
- *
- * @author nikos
- */
+
 public interface HttpSignatureService {
 
     public String generateSignature(String hostUrl, String method, String uri, Object postParams, String contentType, String requestId)

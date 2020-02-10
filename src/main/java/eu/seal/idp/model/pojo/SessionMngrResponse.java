@@ -2,10 +2,7 @@ package eu.seal.idp.model.pojo;
 
 import eu.seal.idp.enums.ResponseCode;
 
-/**
- *
- * @author nikos
- */
+
 public class SessionMngrResponse {
 
     private ResponseCode code;

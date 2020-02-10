@@ -5,10 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import org.apache.commons.httpclient.NameValuePair;
 
-/**
- *
- * @author nikos
- */
+
 public interface NetworkService {
 
     public String sendGet(String hostUrl, String uri, List<NameValuePair> urlParameters, int attempt) throws IOException, NoSuchAlgorithmException;

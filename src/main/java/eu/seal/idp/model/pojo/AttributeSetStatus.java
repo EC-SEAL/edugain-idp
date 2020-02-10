@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
 
-/**
- *
- * @author nikos
- */
+
 public class AttributeSetStatus {
 
     public enum CodeEnum {

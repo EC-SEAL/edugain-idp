@@ -21,15 +21,7 @@ public class SAMLWithRelayStateEntryPoint extends SAMLEntryPoint {
         }
         HttpServletRequestAdapter httpServletRequestAdapter = (HttpServletRequestAdapter) context.getInboundMessageTransport();
         String session = httpServletRequestAdapter.getParameterValue("session");
-        
-
-        if (session != null) {
-            ssoProfileOptions.setRelayState("/as/callback?session=" + session);
-        }
-        
-        else {
-        	log.info("session is null");
-        }
+        ssoProfileOptions.setRelayState("/as/callback?session=" + session);
         
         return ssoProfileOptions;
     }

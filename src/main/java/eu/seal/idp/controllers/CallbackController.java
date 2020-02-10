@@ -118,7 +118,7 @@ public class CallbackController {
 		
 		// Redirect to Callback Address
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
-		return "redirect:/" + callBackAddr; 
+		return "redirect:" + callBackAddr; 
 	}
 
 }

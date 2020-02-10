@@ -2,10 +2,7 @@ package eu.seal.idp.model.pojo;
 
 import java.util.Map;
 
-/**
- *
- * @author nikos
- */
+
 public class MngrSessionTO {
 
     private String sessionId;

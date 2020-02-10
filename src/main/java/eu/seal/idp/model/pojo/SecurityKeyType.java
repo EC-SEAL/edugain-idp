@@ -1,9 +1,6 @@
 package eu.seal.idp.model.pojo;
 
-/**
- *
- * @author nikos
- */
+
 public class SecurityKeyType {
     private String KeyType; // String identifying the kind of key e.g. "RSAPublicKey"
     private EsmoSecurityUsage usage; // To which use is this key intended.

@@ -1,9 +1,6 @@
 package eu.seal.idp.model.pojo;
 
-/**
- *
- * @author nikos
- */
+
 public class UpdateDataRequest {
 
     private String sessionId;

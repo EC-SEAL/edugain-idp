@@ -1,9 +1,6 @@
 package eu.seal.idp.model.pojo;
 
-/**
- *
- * @author nikos
- */
+
 public class EndpointType {
 
     private String type; //String identifying the kind of endpoint (depends on each protocol), e.g. "SSOService"

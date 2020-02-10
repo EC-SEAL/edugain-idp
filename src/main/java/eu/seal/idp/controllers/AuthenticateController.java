@@ -61,7 +61,7 @@ public class AuthenticateController {
 	 * @param msToken
 	 * @param model
 	 * @param redirectAttrs
-	 * @return
+	 * @return redirect :/saml/login (success) or :/authfail
 	 * @throws KeyStoreException
 	 * @throws IOException 
 	 * @throws NoSuchAlgorithmException 
