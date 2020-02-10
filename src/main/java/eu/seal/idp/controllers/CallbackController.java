@@ -9,8 +9,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
+import eu.seal.idp.model.pojo.UpdateDataRequest;
 import eu.seal.idp.service.EsmoMetadataService;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.KeyStoreService;
@@ -82,13 +85,40 @@ public class CallbackController {
 		// Recover Session ID
 		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);
 		String recoveredSessionID = smResp.getSessionData().getSessionId(); 
-		// Generate Datastore
+
+		// Recover DataStore
+		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
+		List <DataSet> dsArrayList = new ArrayList();
 		DataStore datastore = new DataStore();
-		DataSet dataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);;
+		ObjectMapper mapper = new ObjectMapper();
+		LOG.info("Recovered datastore \n" + datastore.toString());
 		
-		// Get Callback Address
+		if(!StringUtils.isEmpty(dataStoreString)) {
+			
+			datastore = mapper.readValue(dataStoreString, DataStore.class);
+			dsArrayList = datastore.getClearData();
+		} else { 
+			String datastoreId = UUID.randomUUID().toString();
+			datastore.setId(datastoreId);
+		}
+		
+		// Update DataStore with incoming DataSet
+		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
+		dsArrayList.add(receivedDataset);
+		datastore.setClearData(dsArrayList);
+		LOG.info("new Datastore \n" + datastore.toString());
+		
+		// Update Session Manager 
+		String stringifiedDatastore = mapper.writeValueAsString(datastore);
+		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
+		
+		// Stores in the DataStore 
+		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
+		LOG.info("Response" + rsp);
+		
+		// Redirect to Callback Address
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
-		return "redirect:/" + callBackAddr; // Change with the callback 
+		return "redirect:/" + callBackAddr; 
 	}
 
 }

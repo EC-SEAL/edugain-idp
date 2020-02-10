@@ -27,6 +27,10 @@ public class SAMLWithRelayStateEntryPoint extends SAMLEntryPoint {
             ssoProfileOptions.setRelayState("/as/callback?session=" + session);
         }
         
+        else {
+        	log.info("session is null");
+        }
+        
         return ssoProfileOptions;
     }
 }
