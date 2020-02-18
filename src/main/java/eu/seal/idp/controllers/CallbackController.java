@@ -71,7 +71,7 @@ public class CallbackController {
 	
 	@RequestMapping("/as/callback")
 	@ResponseBody
-	public String callback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+	public String asCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
 		authentication.getDetails();
 		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -85,6 +85,8 @@ public class CallbackController {
 		// Recover Session ID
 		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);
 		String recoveredSessionID = smResp.getSessionData().getSessionId(); 
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+
 
 		// Recover DataStore
 		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
@@ -117,7 +119,71 @@ public class CallbackController {
 		LOG.info("Response" + rsp);
 		
 		// Redirect to Callback Address
+		return "redirect:" + callBackAddr; 
+	}
+	
+	/**
+	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to the DataStore
+	 * @param session 
+	 * @param authentication
+	 * @param model
+	 * @param redirectAttrs
+	 * @return 
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyStoreException
+	 */
+	
+	@RequestMapping("/is/callback")
+	@ResponseBody
+	public String isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+		authentication.getDetails();
+		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
+		
+		// Request Session Data
+		List<NameValuePair> requestParams = new ArrayList<>();
+		requestParams.add(new NameValuePair("sessionId", sessionId));
+		String clearSmResp = netServ.sendGet(sessionMngrUrl, "/sm/getSessionData",requestParams, 1);
+		
+		// Recover Session ID
+		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);
+		String recoveredSessionID = smResp.getSessionData().getSessionId(); 
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+
+
+//		// Recover DataStore
+//		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
+//		List <DataSet> dsArrayList = new ArrayList();
+//		DataStore datastore = new DataStore();
+//		ObjectMapper mapper = new ObjectMapper();
+//		LOG.info("Recovered datastore \n" + datastore.toString());
+//		
+//		if(!StringUtils.isEmpty(dataStoreString)) {
+//			
+//			datastore = mapper.readValue(dataStoreString, DataStore.class);
+//			dsArrayList = datastore.getClearData();
+//		} else { 
+//			String datastoreId = UUID.randomUUID().toString();
+//			datastore.setId(datastoreId);
+//		}
+//		
+//		// Update DataStore with incoming DataSet
+//		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
+//		dsArrayList.add(receivedDataset);
+//		datastore.setClearData(dsArrayList);
+//		LOG.info("new Datastore \n" + datastore.toString());
+//		
+//		// Update Session Manager 
+//		String stringifiedDatastore = mapper.writeValueAsString(datastore);
+//		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
+//		
+//		// Stores in the DataStore 
+//		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
+//		LOG.info("Response" + rsp);
+		
+		// Redirect to Callback Address
 		return "redirect:" + callBackAddr; 
 	}
 
