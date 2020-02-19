@@ -93,8 +93,6 @@ public class CallbackController {
 		List <DataSet> dsArrayList = new ArrayList();
 		DataStore datastore = new DataStore();
 		ObjectMapper mapper = new ObjectMapper();
-		LOG.info("Recovered datastore \n" + datastore.toString());
-		
 		if(!StringUtils.isEmpty(dataStoreString)) {
 			
 			datastore = mapper.readValue(dataStoreString, DataStore.class);
@@ -108,22 +106,21 @@ public class CallbackController {
 		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
 		dsArrayList.add(receivedDataset);
 		datastore.setClearData(dsArrayList);
-		LOG.info("new Datastore \n" + datastore.toString());
 		
 		// Update Session Manager 
 		String stringifiedDatastore = mapper.writeValueAsString(datastore);
 		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
-		
+				
+				
 		// Stores in the DataStore 
-		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
-		LOG.info("Response" + rsp);
+		netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
 		
 		// Redirect to Callback Address
 		return "redirect:" + callBackAddr; 
 	}
 	
 	/**
-	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to the DataStore
+	 * Manages SAML IS success callback (mapped from /saml/SSO callback) and writes to the DataStore
 	 * @param session 
 	 * @param authentication
 	 * @param model
@@ -131,7 +128,6 @@ public class CallbackController {
 	 * @return 
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
 	 */
 	
 	@RequestMapping("/is/callback")
@@ -153,37 +149,20 @@ public class CallbackController {
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
 
 
-//		// Recover DataStore
-//		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
-//		List <DataSet> dsArrayList = new ArrayList();
-//		DataStore datastore = new DataStore();
-//		ObjectMapper mapper = new ObjectMapper();
-//		LOG.info("Recovered datastore \n" + datastore.toString());
-//		
-//		if(!StringUtils.isEmpty(dataStoreString)) {
-//			
-//			datastore = mapper.readValue(dataStoreString, DataStore.class);
-//			dsArrayList = datastore.getClearData();
-//		} else { 
-//			String datastoreId = UUID.randomUUID().toString();
-//			datastore.setId(datastoreId);
-//		}
-//		
-//		// Update DataStore with incoming DataSet
-//		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
-//		dsArrayList.add(receivedDataset);
-//		datastore.setClearData(dsArrayList);
-//		LOG.info("new Datastore \n" + datastore.toString());
-//		
-//		// Update Session Manager 
-//		String stringifiedDatastore = mapper.writeValueAsString(datastore);
-//		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
-//		
-//		// Stores in the DataStore 
-//		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
-//		LOG.info("Response" + rsp);
+		List <DataSet> dsArrayList = new ArrayList();
+		DataStore datastore = new DataStore();
 		
-		// Redirect to Callback Address
+		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);	
+		dsArrayList.add(receivedDataset);
+		
+		// Update Session Manager 
+		ObjectMapper mapper = new ObjectMapper();
+		String stringifiedDatastore = mapper.writeValueAsString(datastore);
+		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDatastore);
+				
+		
+		netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
+		
 		return "redirect:" + callBackAddr; 
 	}
 

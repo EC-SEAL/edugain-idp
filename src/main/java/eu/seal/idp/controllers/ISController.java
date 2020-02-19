@@ -61,7 +61,7 @@ public class ISController {
 	}
 
 	/**
-	 * Redirects an existing IDP request to the IDP 
+	 * Redirects an existing AP request to the IDP 
 	 * @param msToken
 	 * @param model
 	 * @param redirectAttrs
@@ -92,7 +92,7 @@ public class ISController {
 				LOG.error("no idpRequest found in session" + sealSessionId);
 				return "redirect:/authfail";
 			} else {
-				return "redirect:/saml/login?session=" + sealSessionId + "?callback=/is/callback";
+				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
 			}
 		} else {
 			LOG.error("Something wrong with the SM session: " + resp.getError());
