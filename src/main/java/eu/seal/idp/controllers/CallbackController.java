@@ -95,8 +95,6 @@ public class CallbackController {
 		List <DataSet> dsArrayList = new ArrayList();
 		DataStore datastore = new DataStore();
 		ObjectMapper mapper = new ObjectMapper();
-		LOG.info("Recovered datastore \n" + datastore.toString());
-		
 		if(!StringUtils.isEmpty(dataStoreString)) {
 			
 			datastore = mapper.readValue(dataStoreString, DataStore.class);
@@ -110,20 +108,21 @@ public class CallbackController {
 		dsArrayList.add(receivedDataset);
 		datastore.setClearData(dsArrayList);
 		LOG.info("new Datastore \n" + datastore.toString());
+
 		// Update Session Manager 
 		String stringifiedDatastore = mapper.writeValueAsString(datastore);
 		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
-		
+				
+				
 		// Stores in the DataStore 
-		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
-		LOG.info("Response" + rsp);
+		netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
 		
 		// Redirect to Callback Address
 		return "redirect:" + callBackAddr; 
 	}
 	
 	/**
-	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to the DataStore
+	 * Manages SAML IS success callback (mapped from /saml/SSO callback) and writes to the DataStore
 	 * @param session 
 	 * @param authentication
 	 * @param model
@@ -131,7 +130,6 @@ public class CallbackController {
 	 * @return 
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
 	 */
 	
 	@RequestMapping("/is/callback")

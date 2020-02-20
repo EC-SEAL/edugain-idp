@@ -61,7 +61,7 @@ public class ISController {
 	}
 
 	/**
-	 * Redirects an existing IDP request to the IDP 
+	 * Redirects an existing AP request to the IDP 
 	 * @param msToken
 	 * @param model
 	 * @param redirectAttrs
