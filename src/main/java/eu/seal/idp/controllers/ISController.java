@@ -92,10 +92,10 @@ public class ISController {
 				LOG.error("no idpRequest found in session" + sealSessionId);
 				return "redirect:/authfail";
 			} else {
-				return "redirect:/saml/login?session=" + sealSessionId + "?callback=/is/callback";
+				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
 			}
 		} else {
-			LOG.error("Something wrong with the SM session: " + resp.getError());
+			LOG.error(resp.getError());
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
 		}
 
