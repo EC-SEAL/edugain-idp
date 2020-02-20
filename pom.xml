@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.seal.idp</groupId>
     <artifactId>idp-edugain</artifactId>
-    <version>2.2.1.RELEASE</version>
+    <version>0.1.1.DEVELOPMENT</version>
     <packaging>jar</packaging>
     <!-- Project description -->
     <name>Seal Edugain IDP connector</name>
