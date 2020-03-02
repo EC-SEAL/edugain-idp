@@ -16,8 +16,7 @@ jobs:
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "develop" ]; then
         export CONTAINER_TAG=develop;
-        elif [ "${TRAVIS_BRANCH}" = "master" ]; then
-        export CONTAINER_TAG=latest; elif [ "${TRAVIS_BRANCH}" = "seal-config-comply" ]; then
+        elif [ "${TRAVIS_BRANCH}" = "seal-config-comply" ]; then
         export CONTAINER_TAG=test-ci;'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
