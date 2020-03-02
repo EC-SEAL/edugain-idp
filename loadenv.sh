@@ -1,6 +1,7 @@
 export ASYNC_SIGNATURE=true
 export KEY_PASS=selfsignedpass
 export SIGNING_SECRET=selfsigned
+export STORE_PASS=keystorepass
 export JWT_CERT_ALIAS=selfsigned
 export HTTPSIG_CERT_ALIAS=1
 export SESSION_MANAGER_URL=http://vm.project-seal.eu:9090
