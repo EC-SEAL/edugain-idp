@@ -11,7 +11,7 @@ jobs:
         - mvn test
 
     - stage: Release
-      if: type != pull_request AND(branch = master OR branch = develop)
+      if: type != pull_request AND(branch = master OR branch = develop OR branch = seal-config-comply)
       language: java
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "develop" ]; then
