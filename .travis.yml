@@ -11,14 +11,14 @@ jobs:
         - mvn test
 
     - stage: Release
-      if: type != pull_request AND(branch = master OR branch = develop OR branch = seal-config-comply)
+      if: type != pull_request AND(branch = seal-config-comply OR branch = develop)
       language: java
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "develop" ]; then
         export CONTAINER_TAG=develop;
         elif [ "${TRAVIS_BRANCH}" = "seal-config-comply" ]; then
-        export CONTAINER_TAG=test-ci;'
+        export CONTAINER_TAG=test;'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-        - docker build -t cbuendiaatos/idp-edugain:${CONTAINER_TAG} .
-        - docker push cbuendiaatos/idp-edugain:${CONTAINER_TAG}
+        - docker build -t mvjatos/seal-test:${CONTAINER_TAG} .
+        - docker push mvjatos/seal-test:${CONTAINER_TAG}
