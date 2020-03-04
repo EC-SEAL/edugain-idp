@@ -43,7 +43,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  *  */
 
 @Controller
-public class AuthenticateController {
+public class ISController {
 
 	private final static Logger LOG = LoggerFactory.getLogger(AuthenticateController.class);
 
@@ -51,7 +51,7 @@ public class AuthenticateController {
 	private final KeyStoreService keyServ;
 
 	@Autowired
-	public AuthenticateController(KeyStoreService keyServ,
+	public ISController(KeyStoreService keyServ,
 			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		Key signingKey = this.keyServ.getSigningKey();
@@ -61,7 +61,7 @@ public class AuthenticateController {
 	}
 
 	/**
-	 * Redirects an existing IDP request to the IDP 
+	 * Redirects an existing AP request to the IDP 
 	 * @param msToken
 	 * @param model
 	 * @param redirectAttrs
@@ -73,8 +73,8 @@ public class AuthenticateController {
 	 * @throws JsonParseException 
 	 */
 
-	@RequestMapping(value = {"/as/authenticate"}, method = {RequestMethod.POST, RequestMethod.GET})
-	public String authenticate(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
+	@RequestMapping(value = {"/is/query"}, method = {RequestMethod.POST, RequestMethod.GET})
+	public String query(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
 
 		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
@@ -82,19 +82,20 @@ public class AuthenticateController {
 		ObjectMapper mapper = new ObjectMapper();
 		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
 		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
+
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			String sealSessionId = resp.getSessionData().getSessionId();
 			requestParams.clear();
 			requestParams.add(new NameValuePair("sessionId", sealSessionId));
-			LinkedHashMap<?, ?> idpRequest = (LinkedHashMap<?, ?>) resp.getSessionData().getSessionVariables().get("idpRequest");
+			LinkedHashMap<?, ?> idpRequest = (LinkedHashMap<?, ?>) resp.getSessionData().getSessionVariables().get("apRequest");
 			if (idpRequest == null) {
 				LOG.error("no idpRequest found in session" + sealSessionId);
 				return "redirect:/authfail";
 			} else {
-				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/as/callback";
+				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
 			}
 		} else {
-			LOG.error("Something wrong with the SM session: " + resp.getError());
+			LOG.error(resp.getError());
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
 		}
 
