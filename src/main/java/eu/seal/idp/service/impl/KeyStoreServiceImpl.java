@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.Enumeration;
+
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +61,10 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
     public Key getSigningKey() throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException {
         String asyncSignature = System.getenv("ASYNC_SIGNATURE");
-        if (!org.springframework.util.StringUtils.isEmpty(asyncSignature) && Boolean.valueOf(asyncSignature)) {
-            return keystore.getKey(httpSigKeyAlias, keyPass.toCharArray());
+        System.out.println("This is asyncSig" + asyncSignature);
+	if (!org.springframework.util.StringUtils.isEmpty(asyncSignature) && Boolean.valueOf(asyncSignature)) {
+	    System.out.println("About to create an httpSigKeyAlias" + httpSigKeyAlias);
+            return keystore.getKey("1", keyPass.toCharArray());
         }
         String secretKey = System.getenv("SIGNING_SECRET");
         System.out.print("This is the signing secret" + secretKey);
@@ -80,7 +84,12 @@ public class KeyStoreServiceImpl implements KeyStoreService {
 
     public Key getHttpSigPublicKey() throws KeyStoreException, UnsupportedEncodingException {
         //"httpSignaturesAlias"
-        Certificate cert = keystore.getCertificate(httpSigKeyAlias);
+	Enumeration<String> aliases = keystore.aliases();
+	while (aliases.hasMoreElements()) {
+		System.out.println("Value is " + aliases.nextElement());
+	} 
+    	System.out.println("this is keystore"+ keystore + "\n" + "List of alias: " + keystore.aliases().toString());
+        Certificate cert = keystore.getCertificate("1");
         return cert.getPublicKey();
 
     }

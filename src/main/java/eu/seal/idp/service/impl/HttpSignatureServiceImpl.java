@@ -61,6 +61,7 @@ public class HttpSignatureServiceImpl implements HttpSignatureService {
     public HttpSignatureServiceImpl(String keyId, Key signingKey)
             throws InvalidKeySpecException, IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
         try {
+	    System.out.println("This is signing key" + signingKey);
             this.keyId = keyId;
             this.siginingKey = signingKey;
             this.signer = new Signer(this.siginingKey, new Signature(this.keyId, algorithm, null, "(request-target)", "host", "original-date", "digest", "x-request-id"));

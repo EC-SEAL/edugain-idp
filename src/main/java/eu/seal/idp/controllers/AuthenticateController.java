@@ -55,6 +55,9 @@ public class AuthenticateController {
 			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		Key signingKey = this.keyServ.getSigningKey();
+		System.out.println("THIS IS THE SIGNING SECRET" + System.getenv("SIGNING_SECRET"));
+		
+		System.out.println("Let's take a look at the recently created signing key:" + signingKey);
 		String fingerPrint = this.keyServ.getFingerPrint();
 		HttpSignatureService httpSigServ = new HttpSignatureServiceImpl(fingerPrint, signingKey);
 		this.netServ = new NetworkServiceImpl(httpSigServ);
