@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -74,7 +75,7 @@ public class CallbackController {
 	
 	@RequestMapping("/as/callback")
 	@ResponseBody
-	public String asCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+	public ModelAndView asCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
 		authentication.getDetails();
 		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -118,7 +119,7 @@ public class CallbackController {
 		netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
 		
 		// Redirect to Callback Address
-		return "redirect:" + callBackAddr; 
+		return new ModelAndView("redirect:" + callBackAddr); 
 	}
 	
 	/**
@@ -134,7 +135,7 @@ public class CallbackController {
 	
 	@RequestMapping("/is/callback")
 	@ResponseBody
-	public String isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException, KeyStoreException {
+	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException, KeyStoreException {
 		authentication.getDetails();
 		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -163,7 +164,7 @@ public class CallbackController {
 		
 		// Redirect to Callback Address
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
-		return "redirect:" + callBackAddr; 
+		return new ModelAndView("redirect:" + callBackAddr); 
 	}
 
 }
