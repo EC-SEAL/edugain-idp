@@ -149,12 +149,11 @@ public class CallbackController {
 		
 		// Recover Session ID
 		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);
-		String recoveredSessionID = smResp.getSessionData().getSessionId(); 
 		
 		//Recover Dataset and Metadata
-		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
+		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
 		String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);
-		EntityMetadata metadata = this.metadataServ.getMetadata();
+		//EntityMetadata metadata = this.metadataServ.getMetadata();
 		//UpdateSessionmanager with DSResponse and DSMetadata
 		UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDsResponse);
 		UpdateDataRequest updateReqMetadata = new UpdateDataRequest(sessionId, "dsMetadata", stringifiedDsResponse);
@@ -164,6 +163,7 @@ public class CallbackController {
 		
 		// Redirect to Callback Address
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+		System.out.println("About to redirect to " + callBackAddr);
 		return new ModelAndView("redirect:" + callBackAddr); 
 	}
 

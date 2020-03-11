@@ -127,8 +127,8 @@ public class TokenGenerateController {
 		
 		
 		
-		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "clientCallbackAddr", "https://github.com/EC-SEAL");
-		UpdateDataRequest updateReqIdp = new UpdateDataRequest(sessionId, "idpRequest", idpRequestPlain);
+		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "ClientCallbackAddr", "https://github.com/EC-SEAL");
+		UpdateDataRequest updateReqIdp = new UpdateDataRequest(sessionId, "apRequest", idpRequestPlain);
 		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
 		String rsp2 = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReqIdp, "application/json", 1);
 		return rsp;

@@ -470,6 +470,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
             .authorizeRequests()
            		.antMatchers("*").permitAll()
            		.antMatchers("/as/*").permitAll()
+           		.antMatchers("/is/*").permitAll()
            		.antMatchers("/start/**").permitAll()
            		.antMatchers("/generate/*").permitAll()
            		.antMatchers("/saml/**").permitAll()
