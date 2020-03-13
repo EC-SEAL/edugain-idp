@@ -73,11 +73,11 @@ public class CallbackController {
 	 * @throws KeyStoreException
 	 */
 	
-	@RequestMapping("/as/callback")
+	@RequestMapping("/is/callback")
 	@ResponseBody
-	public ModelAndView asCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
 		authentication.getDetails();
-		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
+		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();	
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
 		
@@ -96,18 +96,22 @@ public class CallbackController {
 		List <DataSet> dsArrayList = new ArrayList();
 		DataStore datastore = new DataStore();
 		ObjectMapper mapper = new ObjectMapper();
-		if(!StringUtils.isEmpty(dataStoreString)) {
-			
+		if(!StringUtils.isEmpty(dataStoreString) && datastore.getClearData()!=null) {
+			System.out.println("Datastore is not null" + dataStoreString);
 			datastore = mapper.readValue(dataStoreString, DataStore.class);
 			dsArrayList = datastore.getClearData();
 		} else { 
+			System.out.println("DataStore is emtpy");
 			String datastoreId = UUID.randomUUID().toString();
 			datastore.setId(datastoreId);
 		}
 		// Update DataStore with incoming DataSet
 		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);
+		System.out.println("Received dataset" + receivedDataset  + "arraylist" + dsArrayList);	
 		dsArrayList.add(receivedDataset);
 		datastore.setClearData(dsArrayList);
+		
+		String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);
 		LOG.info("new Datastore \n" + datastore.toString());
 
 		// Update Session Manager 
@@ -133,9 +137,9 @@ public class CallbackController {
 	 * @throws NoSuchAlgorithmException
 	 */
 	
-	@RequestMapping("/is/callback")
+	@RequestMapping("/as/callback")
 	@ResponseBody
-	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException, KeyStoreException {
+	public ModelAndView asCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException, KeyStoreException {
 		authentication.getDetails();
 		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
