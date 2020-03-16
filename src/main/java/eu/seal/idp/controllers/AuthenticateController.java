@@ -83,7 +83,6 @@ public class AuthenticateController {
 		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
 		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
-			System.out.println("We are at ok");
 			String sealSessionId = resp.getSessionData().getSessionId();
 			requestParams.clear();
 			requestParams.add(new NameValuePair("sessionId", sealSessionId));
@@ -92,7 +91,6 @@ public class AuthenticateController {
 				LOG.error("no idpRequest found in session" + sealSessionId);
 				return "redirect:/authfail";
 			} else {
-				System.out.println("We are about to redirect to sealSessionId");
 				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/as/callback";
 			}
 		} else {
