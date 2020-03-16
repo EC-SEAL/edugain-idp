@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/EC-SEAL/edugain-idp.svg?branch=development)](https://travis-ci.org/EC-SEAL/edugain-idp)
+
 Seal Edugain IDP
 ====================
 
