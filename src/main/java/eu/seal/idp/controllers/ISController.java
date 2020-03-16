@@ -86,13 +86,10 @@ public class ISController {
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			
 			String sealSessionId = resp.getSessionData().getSessionId();
-			LOG.info("is IT OK?");
 			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/is/callback";
-			LOG.info("It is ok bro" + sealSessionId);
 			return "redirect:" + redirectUri;
 		} else {
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
-			LOG.info("Not Ok"  + resp.getError());
 		}
 		LOG.info("LOST");
 		return "redirect:/saml/login";
