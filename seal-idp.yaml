@@ -1,11 +1,52 @@
 swagger: '2.0'
 info:
-  version: '0.0.1'
-  title: 'SEAL IDP ms'
-  description: 'SEAL IDP edugain microservice'
+  version: '0.1.1'
+  title: 'SEAL Edugain IDP IS ms'
+  description: 'SEAL Edugain IDP microservice'
 #paths: {}
-# basePath: /seal-idp
+# basePath: /idp-edugain
 paths:
+  ####### IdentitySource #######
+
+  /is/query:
+    post:
+      tags:
+        - IdentitySource
+      summary: Pass a data query request object to be handled by an identity module ms.
+      description: Process a Data request
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+        - name: "msToken"
+          in: formData   
+          description: The security token for ms to ms calls
+          required: true
+          type: string
+#        - name: "apRequest"
+#          in: formData
+#          description: The standard request object representing the request to be issued to the identity source
+#          required: true
+#          schema:
+#            $ref: "#/definitions/attributeSet"
+#        - name: "apMetadata"
+#          in: query
+#          description: The metadata object of the remote AP that must be queried
+#          required: true
+#          schema:
+#            $ref: "#/definitions/entityMetadata"
+#        - name: "authenticationSet"
+#          in: query
+#          description: A standard response object containing the attributes retreved from the user authentication on SEAL, if any (for now, just ignore).
+#          required: false
+#          schema:
+#            $ref: "#/definitions/attributeSet"
+      responses:
+        200:
+          description: "Request admitted"
+        400:
+          description: "Bad request"
+        401:
+          description: "Request not authorised"
 
 ####### AuthenticationSource #######
 
@@ -23,18 +64,18 @@ paths:
           description: The security token for ms to ms calls
           required: true
           type: string
-        - name: "idpRequest"
-          in: "cookie"
-          description: The standard request object representing the request to be issued to the auth source
-          required: true
-          schema:
-            $ref: "#/definitions/attributeSet"
-        - name: "idpMetadata"  
-          in: "cookie"
-          description: The metadata object of the remote IDP that must be queried
-          required: true
-          schema:
-            $ref: "#/definitions/entityMetadata"
+      #  - name: "idpRequest"
+      #    in: "cookie"
+      #    description: The standard request object representing the request to be issued to the auth source
+      #    required: true
+      #    schema:
+      #      $ref: "#/definitions/attributeSet"
+      #  - name: "idpMetadata"  
+      #    in: "cookie"
+      #    description: The metadata object of the remote IDP that must be queried
+      #    required: true
+      #    schema:
+      #      $ref: "#/definitions/entityMetadata"
       responses:
         200:
           description: "Request admitted"
@@ -45,51 +86,9 @@ paths:
   
   
 
-####### IdentitySource #######
 
-  /is/query:
-    post:
-      tags:
-        - IdentitySource
-      summary: Pass a data query request object to be handled by an identity module ms.
-      description: Process a Data request
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-        - name: "msToken"
-          in: "formData"
-          description: The security token for ms to ms calls
-          required: true
-          type: string
-        - name: "apRequest"
-          in: "cookie"
-          description: The standard request object representing the request to be issued to the identity source
-          required: true
-          schema:
-            $ref: "#/definitions/attributeSet"
-        - name: "apMetadata"
-          in: "cookie"
-          description: The metadata object of the remote AP that must be queried
-          required: true
-          schema:
-            $ref: "#/definitions/entityMetadata"
-        - name: "authenticationSet"
-          in: "cookie"
-          description: A standard response object containing the attributes retreved from the user authentication on SEAL, if any (for now, just ignore).
-          required: false
-          schema:
-            $ref: "#/definitions/attributeSet"
-      responses:
-        200:
-          description: "Request admitted"
-        400:
-          description: "Bad request"
-        401:
-          description: "Request not authorised"
-  
-  
-  
-  definitions:
+          
+definitions:
 
  # Descriptor Object for an Attribute Set (a data request or response)
   attributeSet:
@@ -316,6 +315,32 @@ paths:
       type: array
       items: 
         $ref: '#/definitions/attributeType'
+  
+  dataStore:
+    type: object
+    description: Represents a clear, encrypted and/or signed data set.
+    properties:
+      id:
+        description: Unique identifier of the set
+        type: string
+        example: "6c0f70a8-f32b-4535-b5f6-0d596c52813a"
+      encryptedData:
+        type: string
+        description: If the data store is encrypted, this will be set. B64 string
+      signature:
+        type: string
+        description: If the data store is signed, signature goes here. B64 string. Sign always the decrypted dataset.
+      signatureAlgorithm:
+        type: string
+        description: Descriptor of the signature algorithm used.
+      encryptionAlgorithm:
+        description: Descriptor of the encryption algorithm used.
+        type: string
+      clearData:
+        description: If the data store is in cleartext, this will be set
+        type: array
+        items: 
+          $ref: '#/definitions/dataSet'
         
   dataSet:
     description: Object representing a generic identity data set, retrieved from some source and stored on a user store.
@@ -360,30 +385,5 @@ paths:
         type: object
         #Indicates free-form object
         additionalProperties:
-            type: string 
-            
-  dataStore:
-    type: object
-    description: Represents a clear, encrypted and/or signed data set.
-    properties:
-      id:
-        description: Unique identifier of the set
-        type: string
-        example: "6c0f70a8-f32b-4535-b5f6-0d596c52813a"
-      encryptedData:
-        type: string
-        description: If the data store is encrypted, this will be set. B64 string
-      signature:
-        type: string
-        description: If the data store is signed, signature goes here. B64 string. Sign always the decrypted dataset.
-      signatureAlgorithm:
-        type: string
-        description: Descriptor of the signature algorithm used.
-      encryptionAlgorithm:
-        description: Descriptor of the encryption algorithm used.
-        type: string
-      clearData:
-        description: If the data store is in cleartext, this will be set
-        type: array
-        items: 
-          $ref: '#/definitions/dataSet'      
+            type: string       
+
