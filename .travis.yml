@@ -11,7 +11,7 @@ jobs:
         - mvn test
 
     - stage: Release
-      if: type != pull_request AND(branch = master OR branch = development)
+      if: type != pull_request AND(branch = master OR branch = development OR branch = cbuendia-atos-patch-1)
       language: java
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "development" ]; then
