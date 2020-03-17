@@ -18,7 +18,9 @@ jobs:
         export CONTAINER_TAG=develop;
         elif [ "${TRAVIS_BRANCH}" = "master" ]; then
         export CONTAINER_TAG=master;
-        fi'
+	elif [ "${TRAVIS_BRANCH}" = "cbuendia-atos-patch-1" ]; then
+        export CONTAINER_TAG=patch-test;
+	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
         - docker build -t cbuendiaatos/idp-edugain:${CONTAINER_TAG} .
