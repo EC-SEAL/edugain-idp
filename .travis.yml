@@ -17,7 +17,8 @@ jobs:
       - 'if [ "${TRAVIS_BRANCH}" = "development" ]; then
         export CONTAINER_TAG=develop;
         elif [ "${TRAVIS_BRANCH}" = "master" ]; then
-        export CONTAINER_TAG=master;'
+        export CONTAINER_TAG=master;
+	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
         - docker build -t cbuendiaatos/idp-edugain:${CONTAINER_TAG} .
