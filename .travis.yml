@@ -11,15 +11,13 @@ jobs:
         - mvn test
 
     - stage: Release
-      if: type != pull_request AND(branch = master OR branch = development OR branch = cbuendia-atos-patch-1)
+      if: type != pull_request AND(branch = master OR branch = development)
       language: java
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "development" ]; then
         export CONTAINER_TAG=develop;
         elif [ "${TRAVIS_BRANCH}" = "master" ]; then
         export CONTAINER_TAG=master;
-	elif [ "${TRAVIS_BRANCH}" = "cbuendia-atos-patch-1" ]; then
-        export CONTAINER_TAG=patch-test;
 	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
