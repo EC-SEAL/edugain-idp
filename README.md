@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/EC-SEAL/edugain-idp.svg?branch=development)](https://travis-ci.org/EC-SEAL/edugain-idp)
+
 Seal Edugain IDP
 ====================
 
@@ -14,6 +16,7 @@ The following environmental variables need to be set prior to running the projec
 |------------------|
 | ASYNC_SYGNATURE  |
 | KEY_PASS         |
+| STORE_PASS       |
 | SIGNING_SECRET   |
 | SESSION_MANAGER_URL| 
 | KEY_STORE_PATH   |

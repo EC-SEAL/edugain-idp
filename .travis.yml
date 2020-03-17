@@ -1,0 +1,24 @@
+language: java
+
+stages:
+  - Test
+  - Release
+
+jobs:
+  include:
+    - stage : Test
+      script:
+        - mvn test
+
+    - stage: Release
+      if: type != pull_request AND(branch = master OR branch = development)
+      language: java
+      before_script:
+      - 'if [ "${TRAVIS_BRANCH}" = "development" ]; then
+        export CONTAINER_TAG=develop;
+        elif [ "${TRAVIS_BRANCH}" = "master" ]; then
+        export CONTAINER_TAG=master;'
+      script:
+        - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+        - docker build -t cbuendiaatos/idp-edugain:${CONTAINER_TAG} .
+        - docker push cbuendiaatos/idp-edugain:${CONTAINER_TAG}

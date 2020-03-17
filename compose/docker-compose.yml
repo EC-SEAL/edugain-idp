@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+
+  edugain-idp:
+     image: cbuendiaatos/idp-edugain:latest
+     restart: on-failure
+     environment:
+       - ASYNC_SIGNATURE=${ASYNC_SIGNATURE}
+       - KEY_PASS=${KEY_PASS}
+       - SIGNING_SECRET=${SIGNING_SECRET}
+       - JWT_CERT_ALIAS=${JWT_CERT_ALIAS}
+       - STORE_PASS=${STORE_PASS}
+       - HTTPSIG_CERT_ALIAS={HTTPSIG_CERT_ALIAS}
+       - SESSION_MANAGER_URL=${SESSION_MANAGER_URL}
+       - KEYSTORE_PATH=${KEYSTORE_PATH}
+       - IDP_METADATA_URL=${IDP_METADATA_URL}
+       - KEYSTORE_PASS=${KEYSTORE_PASS}
+       - KEYSTORE_ID=${KEYSTORE_ID}
+       - TESTING=${TESTING}
