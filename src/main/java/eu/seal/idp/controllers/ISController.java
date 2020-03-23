@@ -84,7 +84,6 @@ public class ISController {
 		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
 		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
-			
 			String sealSessionId = resp.getSessionData().getSessionId();
 			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/is/callback";
 			return "redirect:" + redirectUri;
