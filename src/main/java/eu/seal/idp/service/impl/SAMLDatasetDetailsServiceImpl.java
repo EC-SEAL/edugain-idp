@@ -34,7 +34,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		DataSet dataSet = new DataSet();
         dataSet.setIssuerId("This is the user ID.");
         dataSet.setIssued(nowDate);
-        dataSet.setType("eIDAS");
+        dataSet.setType("eduGAIN");
 		
 		List<Attribute> attributesList = credential.getAttributes();
 		
