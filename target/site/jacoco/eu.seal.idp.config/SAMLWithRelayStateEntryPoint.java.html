@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SAMLWithRelayStateEntryPoint.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.config</a> &gt; <span class="el_source">SAMLWithRelayStateEntryPoint.java</span></div><h1>SAMLWithRelayStateEntryPoint.java</h1><pre class="source lang-java linenums">package eu.seal.idp.config;
+
+import org.opensaml.ws.transport.http.HttpServletRequestAdapter;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.saml.SAMLEntryPoint;
+import org.springframework.security.saml.context.SAMLMessageContext;
+import org.springframework.security.saml.websso.WebSSOProfileOptions;
+
+
+
+<span class="nc" id="L11">public class SAMLWithRelayStateEntryPoint extends SAMLEntryPoint {</span>
+
+    @Override
+    protected WebSSOProfileOptions getProfileOptions(SAMLMessageContext context, AuthenticationException exception) {
+
+        WebSSOProfileOptions ssoProfileOptions;
+<span class="nc bnc" id="L17" title="All 2 branches missed.">        if (defaultOptions != null) {</span>
+<span class="nc" id="L18">            ssoProfileOptions = defaultOptions.clone();</span>
+<span class="nc" id="L19">        } else {</span>
+<span class="nc" id="L20">            ssoProfileOptions = new WebSSOProfileOptions();</span>
+        }
+<span class="nc" id="L22">        HttpServletRequestAdapter httpServletRequestAdapter = (HttpServletRequestAdapter) context.getInboundMessageTransport();</span>
+<span class="nc" id="L23">        String session = httpServletRequestAdapter.getParameterValue(&quot;session&quot;);</span>
+<span class="nc" id="L24">        String callback = httpServletRequestAdapter.getParameterValue(&quot;callback&quot;); </span>
+<span class="nc" id="L25">        System.out.println(&quot;Received session = &quot; + session + &quot;Received callback&quot; + callback);</span>
+<span class="nc" id="L26">        ssoProfileOptions.setRelayState(callback + &quot;?session=&quot; + session);</span>
+        
+<span class="nc" id="L28">        return ssoProfileOptions;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

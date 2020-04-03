@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CallbackController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.controllers</a> &gt; <span class="el_source">CallbackController.java</span></div><h1>CallbackController.java</h1><pre class="source lang-java linenums">	package eu.seal.idp.controllers;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Key;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.saml.SAMLCredential;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.seal.idp.model.pojo.DataSet;
+import eu.seal.idp.model.pojo.DataStore;
+import eu.seal.idp.model.pojo.EntityMetadata;
+import eu.seal.idp.model.pojo.SessionMngrResponse;
+import eu.seal.idp.model.pojo.UpdateDataRequest;
+import eu.seal.idp.service.SealMetadataService;
+import eu.seal.idp.service.HttpSignatureService;
+import eu.seal.idp.service.KeyStoreService;
+import eu.seal.idp.service.NetworkService;
+import eu.seal.idp.service.impl.HttpSignatureServiceImpl;
+import eu.seal.idp.service.impl.NetworkServiceImpl;
+import eu.seal.idp.service.impl.SAMLDatasetDetailsServiceImpl;
+
+@Controller
+public class CallbackController {
+	
+	private final NetworkService netServ;
+	private final KeyStoreService keyServ;
+	private final SealMetadataService metadataServ;
+	// Logger
+<span class="nc" id="L49">	private static final Logger LOG = LoggerFactory</span>
+<span class="nc" id="L50">			.getLogger(CallbackController.class);</span>
+	
+	@Autowired
+<span class="nc" id="L53">	public CallbackController(KeyStoreService keyServ,</span>
+			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
+<span class="nc" id="L55">		this.keyServ = keyServ;</span>
+<span class="nc" id="L56">		this.metadataServ=metadataServ;</span>
+<span class="nc" id="L57">		Key signingKey = this.keyServ.getSigningKey();</span>
+<span class="nc" id="L58">		String fingerPrint = this.keyServ.getFingerPrint();</span>
+<span class="nc" id="L59">		HttpSignatureService httpSigServ = new HttpSignatureServiceImpl(fingerPrint, signingKey);</span>
+<span class="nc" id="L60">		this.netServ = new NetworkServiceImpl(httpSigServ);</span>
+<span class="nc" id="L61">	}</span>
+	
+	/**
+	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to the DataStore
+	 * @param session 
+	 * @param authentication
+	 * @param model
+	 * @param redirectAttrs
+	 * @return 
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyStoreException
+	 */
+	
+	@RequestMapping(&quot;/as/callback&quot;)
+	@ResponseBody
+	public String asCallback(@RequestParam(value = &quot;session&quot;, required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+<span class="nc" id="L78">		authentication.getDetails();</span>
+<span class="nc" id="L79">		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		</span>
+<span class="nc" id="L80">		Authentication auth = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="nc" id="L81">		String sessionMngrUrl = System.getenv(&quot;SESSION_MANAGER_URL&quot;);</span>
+		
+		// Request Session Data
+<span class="nc" id="L84">		List&lt;NameValuePair&gt; requestParams = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L85">		requestParams.add(new NameValuePair(&quot;sessionId&quot;, sessionId));</span>
+<span class="nc" id="L86">		String clearSmResp = netServ.sendGet(sessionMngrUrl, &quot;/sm/getSessionData&quot;,requestParams, 1);</span>
+		
+		// Recover Session ID
+<span class="nc" id="L89">		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);</span>
+<span class="nc" id="L90">		String recoveredSessionID = smResp.getSessionData().getSessionId(); </span>
+<span class="nc" id="L91">		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get(&quot;clientCallbackAddr&quot;);</span>
+
+		// Recover DataStore
+<span class="nc" id="L94">		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get(&quot;dataStore&quot;);</span>
+<span class="nc" id="L95">		List &lt;DataSet&gt; dsArrayList = new ArrayList();</span>
+<span class="nc" id="L96">		DataStore datastore = new DataStore();</span>
+<span class="nc" id="L97">		ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">		if(!StringUtils.isEmpty(dataStoreString)) {</span>
+			
+<span class="nc" id="L100">			datastore = mapper.readValue(dataStoreString, DataStore.class);</span>
+<span class="nc" id="L101">			dsArrayList = datastore.getClearData();</span>
+<span class="nc" id="L102">		} else { </span>
+<span class="nc" id="L103">			String datastoreId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L104">			datastore.setId(datastoreId);</span>
+		}
+		// Update DataStore with incoming DataSet
+<span class="nc" id="L107">		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);</span>
+<span class="nc" id="L108">		dsArrayList.add(receivedDataset);</span>
+<span class="nc" id="L109">		datastore.setClearData(dsArrayList);</span>
+<span class="nc" id="L110">		LOG.info(&quot;new Datastore \n&quot; + datastore.toString());</span>
+
+		// Update Session Manager 
+<span class="nc" id="L113">		String stringifiedDatastore = mapper.writeValueAsString(datastore);</span>
+<span class="nc" id="L114">		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, &quot;dataStore&quot;, stringifiedDatastore);</span>
+				
+				
+		// Stores in the DataStore 
+<span class="nc" id="L118">		netServ.sendPostBody(sessionMngrUrl, &quot;/sm/updateSessionData&quot;, updateReq, &quot;application/json&quot;, 1);</span>
+		
+		// Redirect to Callback Address
+<span class="nc" id="L121">		return &quot;redirect:&quot; + callBackAddr; </span>
+	}
+	
+	/**
+	 * Manages SAML IS success callback (mapped from /saml/SSO callback) and writes to the DataStore
+	 * @param session 
+	 * @param authentication
+	 * @param model
+	 * @param redirectAttrs
+	 * @return 
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
+	
+	@RequestMapping(&quot;/is/callback&quot;)
+	@ResponseBody
+	public String isCallback(@RequestParam(value = &quot;session&quot;, required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException, KeyStoreException {
+<span class="nc" id="L138">		authentication.getDetails();</span>
+<span class="nc" id="L139">		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		</span>
+<span class="nc" id="L140">		Authentication auth = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="nc" id="L141">		String sessionMngrUrl = System.getenv(&quot;SESSION_MANAGER_URL&quot;);</span>
+		
+		// Request Session Data
+<span class="nc" id="L144">		List&lt;NameValuePair&gt; requestParams = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L145">		requestParams.add(new NameValuePair(&quot;sessionId&quot;, sessionId));</span>
+<span class="nc" id="L146">		String clearSmResp = netServ.sendGet(sessionMngrUrl, &quot;/sm/getSessionData&quot;,requestParams, 1);</span>
+<span class="nc" id="L147">		ObjectMapper mapper = new ObjectMapper();</span>
+		
+		// Recover Session ID
+<span class="nc" id="L150">		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);</span>
+<span class="nc" id="L151">		String recoveredSessionID = smResp.getSessionData().getSessionId(); </span>
+		
+		//Recover Dataset and Metadata
+<span class="nc" id="L154">		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(recoveredSessionID, credentials);</span>
+<span class="nc" id="L155">		String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);</span>
+<span class="nc" id="L156">		EntityMetadata metadata = this.metadataServ.getMetadata();</span>
+		//UpdateSessionmanager with DSResponse and DSMetadata
+<span class="nc" id="L158">		UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, &quot;dsResponse&quot;, stringifiedDsResponse);</span>
+<span class="nc" id="L159">		UpdateDataRequest updateReqMetadata = new UpdateDataRequest(sessionId, &quot;dsMetadata&quot;, stringifiedDsResponse);</span>
+
+<span class="nc" id="L161">		netServ.sendPostBody(sessionMngrUrl, &quot;/sm/updateSessionData&quot;, updateReqResponse, &quot;application/json&quot;, 1);</span>
+<span class="nc" id="L162">		netServ.sendPostBody(sessionMngrUrl, &quot;/sm/updateSessionData&quot;, updateReqMetadata, &quot;application/json&quot;, 1);</span>
+		
+		// Redirect to Callback Address
+<span class="nc" id="L165">		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get(&quot;clientCallbackAddr&quot;);</span>
+<span class="nc" id="L166">		return &quot;redirect:&quot; + callBackAddr; </span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

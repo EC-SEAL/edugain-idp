@@ -1,0 +1,26 @@
+edugain-idp:
+        image: cbuendiaatos/idp-edugain:apigw-test
+        restart: on-failure
+        command:
+          - "-Dorg.opensaml.httpclient.https.disableHostnameVerification=true"
+        environment:
+          - ASYNC_SIGNATURE=true
+          - KEY_PASS=selfsignedpass
+          - SIGNING_SECRET=selfsigned
+          - JWT_CERT_ALIAS=selfsigned
+          - SAML_KEYSTORE_PATH=classpath:/saml/your_site_name.jks
+          - SAML_KEYSTORE_PASS=password
+          - SAML_KEYSTORE_ID=server
+          - SAML_KEY_PASS=password
+          - STORE_PASS=keystorepass
+          - HTTPSIG_CERT_ALIAS=1
+          - SESSION_MANAGER_URL=http://vm.project-seal.eu:9090
+          - KEYSTORE_PATH=resources/testKeys/keystore.jks
+          - IDP_METADATA_URL=https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml
+          - KEYSTORE_PASS=nalle123
+          - KEYSTORE_ID=apollo
+          - TESTING=true
+        volumes:
+          - ../resources:/resources
+        ports:
+          - 10081:8080

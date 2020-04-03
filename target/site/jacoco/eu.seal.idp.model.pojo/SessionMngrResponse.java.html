@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionMngrResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.model.pojo</a> &gt; <span class="el_source">SessionMngrResponse.java</span></div><h1>SessionMngrResponse.java</h1><pre class="source lang-java linenums">package eu.seal.idp.model.pojo;
+
+import eu.seal.idp.enums.ResponseCode;
+
+
+public class SessionMngrResponse {
+
+    private ResponseCode code;
+    private MngrSessionTO sessionData;
+    private String additionalData;
+    private String error;
+
+<span class="nc" id="L13">    public SessionMngrResponse(ResponseCode code, MngrSessionTO sessionData, String extraData, String error) {</span>
+<span class="nc" id="L14">        this.code = code;</span>
+<span class="nc" id="L15">        this.sessionData = sessionData;</span>
+<span class="nc" id="L16">        this.additionalData = extraData;</span>
+<span class="nc" id="L17">        this.error = error;</span>
+<span class="nc" id="L18">    }</span>
+
+<span class="nc" id="L20">    public SessionMngrResponse() {</span>
+<span class="nc" id="L21">    }</span>
+
+    public ResponseCode getCode() {
+<span class="nc" id="L24">        return code;</span>
+    }
+
+    public void setCode(ResponseCode code) {
+<span class="nc" id="L28">        this.code = code;</span>
+<span class="nc" id="L29">    }</span>
+
+    public MngrSessionTO getSessionData() {
+<span class="nc" id="L32">        return sessionData;</span>
+    }
+
+    public void setSessionData(MngrSessionTO sessionData) {
+<span class="nc" id="L36">        this.sessionData = sessionData;</span>
+<span class="nc" id="L37">    }</span>
+
+    public String getError() {
+<span class="nc" id="L40">        return error;</span>
+    }
+
+    public void setError(String error) {
+<span class="nc" id="L44">        this.error = error;</span>
+<span class="nc" id="L45">    }</span>
+
+    public String getAdditionalData() {
+<span class="nc" id="L48">        return additionalData;</span>
+    }
+
+    public void setAdditionalData(String additionalData) {
+<span class="nc" id="L52">        this.additionalData = additionalData;</span>
+<span class="nc" id="L53">    }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

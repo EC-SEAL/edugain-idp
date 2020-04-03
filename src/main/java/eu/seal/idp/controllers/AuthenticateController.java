@@ -85,7 +85,6 @@ public class AuthenticateController {
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			String sealSessionId = resp.getSessionData().getSessionId();
 			return "redirect:/saml/login?session=" + sealSessionId + "&callback=/as/callback";
-
 		} else {
 			LOG.error("Something wrong with the SM session: " + resp.getError());
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());

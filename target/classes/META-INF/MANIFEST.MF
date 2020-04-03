@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 10
+Implementation-Title: Seal Edugain IDP connector
+Implementation-Version: 0.1.1.DEVELOPMENT
+Main-Class: eu.seal.idp.Application
+Created-By: Maven Integration for Eclipse
+

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntityMetadata.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.model.pojo</a> &gt; <span class="el_source">EntityMetadata.java</span></div><h1>EntityMetadata.java</h1><pre class="source lang-java linenums">package eu.seal.idp.model.pojo;
+
+import java.util.Map;
+
+
+public class EntityMetadata {
+    
+    
+    private String entityId; //Unique identifier of the entity, usually a metadata url, e.g. &quot;https://esmo.uji.es/gw/saml/idp/metadata.xml&quot;
+    private String defaultDisplayName;  //Name to be displayed on UI, in the default language/encoding
+    private Map&lt;String,String&gt; displayNames; //  alternative display names, by language or encoding, e.g. {&quot;ES&quot; : &quot;UJI Proveedor de Identidad&quot;,&quot;EN&quot; : &quot;UJI Identity Provider&quot;}
+    private String logo; // B64 string with an image binary to be displayed at UI
+    private String[] location;//  nspecified list of information items about the physical or political location of the entity, to facilitate discovery
+    private String protocol; // Which protocol does this entity support (SAML, OIDC, etc.)
+    private String[] microservice; //list of identifiers of microservice able to handle this external entity
+    private String[] claims; // list of attributes supported/requested by default by this entity, e.g. [&quot;displayName&quot;,&quot;surname&quot;,&quot;dateOfBirth&quot;,&quot;eduPersonAffiliation&quot;]
+    private EndpointType[] endpoints; // List of service endpoints, where this Entity will accept requests/responses.
+    private SecurityKeyType[] securityKeys; //List of keys held by this entity
+    private boolean encryptResponses; //whether this entity will issue/expect encrypted responses
+    private String[] supportedEncryptionAlg; //list of supported encryption algorithms, e.g.  [&quot;AES256&quot;,&quot;AES512&quot;]
+    private boolean signResponses; // whether this entity will issue/expect signed responses
+    private String[] supportedSigningAlg; // list of supported signing algorithms
+    private Map&lt;String,Object&gt; otherData; //Dictionary of additional fields, specific for a certain entity type or protocol, e.g. [&quot;attributeMappingToEIDAS&quot; : {&quot;displayName&quot; : &quot;CurrentGivenName&quot;, &quot;surname&quot; : &quot;CurrentFamilyName&quot;}]
+
+<span class="nc" id="L25">    public EntityMetadata(String entityId, String defaultDisplayName, Map&lt;String, String&gt; displayNames, String logo, String[] location, String protocol, String[] microservice, String[] claims, EndpointType[] endpoints, SecurityKeyType[] securityKeys, boolean encryptResponses, String[] supportedEncryptionAlg, boolean signResponses, String[] supportedSigningAlg, Map&lt;String, Object&gt; otherData) {</span>
+<span class="nc" id="L26">        this.entityId = entityId;</span>
+<span class="nc" id="L27">        this.defaultDisplayName = defaultDisplayName;</span>
+<span class="nc" id="L28">        this.displayNames = displayNames;</span>
+<span class="nc" id="L29">        this.logo = logo;</span>
+<span class="nc" id="L30">        this.location = location;</span>
+<span class="nc" id="L31">        this.protocol = protocol;</span>
+<span class="nc" id="L32">        this.microservice = microservice;</span>
+<span class="nc" id="L33">        this.claims = claims;</span>
+<span class="nc" id="L34">        this.endpoints = endpoints;</span>
+<span class="nc" id="L35">        this.securityKeys = securityKeys;</span>
+<span class="nc" id="L36">        this.encryptResponses = encryptResponses;</span>
+<span class="nc" id="L37">        this.supportedEncryptionAlg = supportedEncryptionAlg;</span>
+<span class="nc" id="L38">        this.signResponses = signResponses;</span>
+<span class="nc" id="L39">        this.supportedSigningAlg = supportedSigningAlg;</span>
+<span class="nc" id="L40">        this.otherData = otherData;</span>
+<span class="nc" id="L41">    }</span>
+
+<span class="nc" id="L43">    public EntityMetadata() {</span>
+<span class="nc" id="L44">    }</span>
+
+    public String getEntityId() {
+<span class="nc" id="L47">        return entityId;</span>
+    }
+
+    public void setEntityId(String entityId) {
+<span class="nc" id="L51">        this.entityId = entityId;</span>
+<span class="nc" id="L52">    }</span>
+
+    public String getDefaultDisplayName() {
+<span class="nc" id="L55">        return defaultDisplayName;</span>
+    }
+
+    public void setDefaultDisplayName(String defaultDisplayName) {
+<span class="nc" id="L59">        this.defaultDisplayName = defaultDisplayName;</span>
+<span class="nc" id="L60">    }</span>
+
+    public Map&lt;String, String&gt; getDisplayNames() {
+<span class="nc" id="L63">        return displayNames;</span>
+    }
+
+    public void setDisplayNames(Map&lt;String, String&gt; displayNames) {
+<span class="nc" id="L67">        this.displayNames = displayNames;</span>
+<span class="nc" id="L68">    }</span>
+
+    public String getLogo() {
+<span class="nc" id="L71">        return logo;</span>
+    }
+
+    public void setLogo(String logo) {
+<span class="nc" id="L75">        this.logo = logo;</span>
+<span class="nc" id="L76">    }</span>
+
+    public String[] getLocation() {
+<span class="nc" id="L79">        return location;</span>
+    }
+
+    public void setLocation(String[] location) {
+<span class="nc" id="L83">        this.location = location;</span>
+<span class="nc" id="L84">    }</span>
+
+    public String getProtocol() {
+<span class="nc" id="L87">        return protocol;</span>
+    }
+
+    public void setProtocol(String protocol) {
+<span class="nc" id="L91">        this.protocol = protocol;</span>
+<span class="nc" id="L92">    }</span>
+
+    public String[] getMicroservice() {
+<span class="nc" id="L95">        return microservice;</span>
+    }
+
+    public void setMicroservice(String[] microservice) {
+<span class="nc" id="L99">        this.microservice = microservice;</span>
+<span class="nc" id="L100">    }</span>
+
+    public String[] getClaims() {
+<span class="nc" id="L103">        return claims;</span>
+    }
+
+    public void setClaims(String[] claims) {
+<span class="nc" id="L107">        this.claims = claims;</span>
+<span class="nc" id="L108">    }</span>
+
+    public EndpointType[] getEndpoints() {
+<span class="nc" id="L111">        return endpoints;</span>
+    }
+
+    public void setEndpoints(EndpointType[] endpoints) {
+<span class="nc" id="L115">        this.endpoints = endpoints;</span>
+<span class="nc" id="L116">    }</span>
+
+    public SecurityKeyType[] getSecurityKeys() {
+<span class="nc" id="L119">        return securityKeys;</span>
+    }
+
+    public void setSecurityKeys(SecurityKeyType[] securityKeys) {
+<span class="nc" id="L123">        this.securityKeys = securityKeys;</span>
+<span class="nc" id="L124">    }</span>
+
+    public boolean isEncryptResponses() {
+<span class="nc" id="L127">        return encryptResponses;</span>
+    }
+
+    public void setEncryptResponses(boolean encryptResponses) {
+<span class="nc" id="L131">        this.encryptResponses = encryptResponses;</span>
+<span class="nc" id="L132">    }</span>
+
+    public String[] getSupportedEncryptionAlg() {
+<span class="nc" id="L135">        return supportedEncryptionAlg;</span>
+    }
+
+    public void setSupportedEncryptionAlg(String[] supportedEncryptionAlg) {
+<span class="nc" id="L139">        this.supportedEncryptionAlg = supportedEncryptionAlg;</span>
+<span class="nc" id="L140">    }</span>
+
+    public boolean isSignResponses() {
+<span class="nc" id="L143">        return signResponses;</span>
+    }
+
+    public void setSignResponses(boolean signResponses) {
+<span class="nc" id="L147">        this.signResponses = signResponses;</span>
+<span class="nc" id="L148">    }</span>
+
+    public String[] getSupportedSigningAlg() {
+<span class="nc" id="L151">        return supportedSigningAlg;</span>
+    }
+
+    public void setSupportedSigningAlg(String[] supportedSigningAlg) {
+<span class="nc" id="L155">        this.supportedSigningAlg = supportedSigningAlg;</span>
+<span class="nc" id="L156">    }</span>
+
+    public Map&lt;String, Object&gt; getOtherData() {
+<span class="nc" id="L159">        return otherData;</span>
+    }
+
+    public void setOtherData(Map&lt;String, Object&gt; otherData) {
+<span class="nc" id="L163">        this.otherData = otherData;</span>
+<span class="nc" id="L164">    }</span>
+
+
+    
+    
+    
+    
+    
+    
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
