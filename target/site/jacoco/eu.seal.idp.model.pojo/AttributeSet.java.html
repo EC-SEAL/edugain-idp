@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeSet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.model.pojo</a> &gt; <span class="el_source">AttributeSet.java</span></div><h1>AttributeSet.java</h1><pre class="source lang-java linenums">package eu.seal.idp.model.pojo;
+
+import java.util.Map;
+
+import eu.seal.idp.enums.TypeEnum;
+
+
+public class AttributeSet {
+
+    private String id;
+    private TypeEnum type;
+    private String issuer;
+    private String recipient;
+    private AttributeType[] attributes;
+    private Map&lt;String, String&gt; properties;
+
+    private String inResponseTo;
+
+    private String loa;
+
+    private String notBefore;
+
+    private String notAfter;
+
+    private AttributeSetStatus status;
+
+<span class="nc" id="L27">    public AttributeSet(String id, TypeEnum type, String issuer, String recipient, AttributeType[] attributes,</span>
+            Map&lt;String, String&gt; properties, String inResponseTo, String loa, String notBefore, String notAfter, AttributeSetStatus status) {
+<span class="nc" id="L29">        this.id = id;</span>
+<span class="nc" id="L30">        this.type = type;</span>
+<span class="nc" id="L31">        this.issuer = issuer;</span>
+<span class="nc" id="L32">        this.recipient = recipient;</span>
+<span class="nc" id="L33">        this.attributes = attributes;</span>
+<span class="nc" id="L34">        this.properties = properties;</span>
+<span class="nc" id="L35">        this.inResponseTo = inResponseTo;</span>
+<span class="nc" id="L36">        this.loa = loa;</span>
+<span class="nc" id="L37">        this.notBefore = notBefore;</span>
+<span class="nc" id="L38">        this.notAfter = notAfter;</span>
+<span class="nc" id="L39">        this.status = status;</span>
+<span class="nc" id="L40">    }</span>
+
+<span class="nc" id="L42">    public AttributeSet() {</span>
+<span class="nc" id="L43">    }</span>
+
+    public String getInResponseTo() {
+<span class="nc" id="L46">        return inResponseTo;</span>
+    }
+
+    public void setInResponseTo(String inResponseTo) {
+<span class="nc" id="L50">        this.inResponseTo = inResponseTo;</span>
+<span class="nc" id="L51">    }</span>
+
+    public String getLoa() {
+<span class="nc" id="L54">        return loa;</span>
+    }
+
+    public void setLoa(String loa) {
+<span class="nc" id="L58">        this.loa = loa;</span>
+<span class="nc" id="L59">    }</span>
+
+    public String getNotBefore() {
+<span class="nc" id="L62">        return notBefore;</span>
+    }
+
+    public void setNotBefore(String notBefore) {
+<span class="nc" id="L66">        this.notBefore = notBefore;</span>
+<span class="nc" id="L67">    }</span>
+
+    public String getNotAfter() {
+<span class="nc" id="L70">        return notAfter;</span>
+    }
+
+    public void setNotAfter(String notAfter) {
+<span class="nc" id="L74">        this.notAfter = notAfter;</span>
+<span class="nc" id="L75">    }</span>
+
+    public AttributeSetStatus getStatus() {
+<span class="nc" id="L78">        return status;</span>
+    }
+
+    public void setStatus(AttributeSetStatus status) {
+<span class="nc" id="L82">        this.status = status;</span>
+<span class="nc" id="L83">    }</span>
+
+    public String getId() {
+<span class="nc" id="L86">        return id;</span>
+    }
+
+    public void setId(String id) {
+<span class="nc" id="L90">        this.id = id;</span>
+<span class="nc" id="L91">    }</span>
+
+    public TypeEnum getType() {
+<span class="nc" id="L94">        return type;</span>
+    }
+
+    public void setType(TypeEnum type) {
+<span class="nc" id="L98">        this.type = type;</span>
+<span class="nc" id="L99">    }</span>
+
+    public String getIssuer() {
+<span class="nc" id="L102">        return issuer;</span>
+    }
+
+    public void setIssuer(String issuer) {
+<span class="nc" id="L106">        this.issuer = issuer;</span>
+<span class="nc" id="L107">    }</span>
+
+    public String getRecipient() {
+<span class="nc" id="L110">        return recipient;</span>
+    }
+
+    public void setRecipient(String recipient) {
+<span class="nc" id="L114">        this.recipient = recipient;</span>
+<span class="nc" id="L115">    }</span>
+
+    public AttributeType[] getAttributes() {
+<span class="nc" id="L118">        return attributes;</span>
+    }
+
+    public void setAttributes(AttributeType[] attributes) {
+<span class="nc" id="L122">        this.attributes = attributes;</span>
+<span class="nc" id="L123">    }</span>
+
+    public Map&lt;String, String&gt; getProperties() {
+<span class="nc" id="L126">        return properties;</span>
+    }
+
+    public void setProperties(Map&lt;String, String&gt; properties) {
+<span class="nc" id="L130">        this.properties = properties;</span>
+<span class="nc" id="L131">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L135">        return &quot;AttributeSet{&quot; + &quot;id=&quot; + id + &quot;, type=&quot; + type + &quot;, issuer=&quot; + issuer + &quot;, recipient=&quot; + recipient + &quot;, attributes=&quot; + attributes + &quot;, properties=&quot; + properties + &quot;, inResponseTo=&quot; + inResponseTo + &quot;, loa=&quot; + loa + &quot;, notBefore=&quot; + notBefore + &quot;, notAfter=&quot; + notAfter + &quot;, status=&quot; + status + '}';</span>
+    }
+
+    
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

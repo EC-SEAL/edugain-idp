@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EndpointType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.model.pojo</a> &gt; <span class="el_source">EndpointType.java</span></div><h1>EndpointType.java</h1><pre class="source lang-java linenums">package eu.seal.idp.model.pojo;
+
+
+public class EndpointType {
+
+    private String type; //String identifying the kind of endpoint (depends on each protocol), e.g. &quot;SSOService&quot;
+    private String method; //String identifying the method to access the endpoint (depends on each protocol, i.e. HTTP-POST).
+    private String url; // Access url of the endpoint, e.g. &quot;https://esmo.uji.es/gw/saml/idp/SSOService.php&quot;
+
+<span class="nc" id="L10">    public EndpointType() {</span>
+<span class="nc" id="L11">    }</span>
+
+<span class="nc" id="L13">    public EndpointType(String type, String method, String url) {</span>
+<span class="nc" id="L14">        this.type = type;</span>
+<span class="nc" id="L15">        this.method = method;</span>
+<span class="nc" id="L16">        this.url = url;</span>
+<span class="nc" id="L17">    }</span>
+
+    public String getType() {
+<span class="nc" id="L20">        return type;</span>
+    }
+
+    public void setType(String type) {
+<span class="nc" id="L24">        this.type = type;</span>
+<span class="nc" id="L25">    }</span>
+
+    public String getMethod() {
+<span class="nc" id="L28">        return method;</span>
+    }
+
+    public void setMethod(String method) {
+<span class="nc" id="L32">        this.method = method;</span>
+<span class="nc" id="L33">    }</span>
+
+    public String getUrl() {
+<span class="nc" id="L36">        return url;</span>
+    }
+
+    public void setUrl(String url) {
+<span class="nc" id="L40">        this.url = url;</span>
+<span class="nc" id="L41">    }</span>
+    
+    
+           
+
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

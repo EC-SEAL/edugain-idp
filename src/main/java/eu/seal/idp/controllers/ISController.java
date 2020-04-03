@@ -85,15 +85,7 @@ public class ISController {
 
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			String sealSessionId = resp.getSessionData().getSessionId();
-			requestParams.clear();
-			requestParams.add(new NameValuePair("sessionId", sealSessionId));
-			LinkedHashMap<?, ?> idpRequest = (LinkedHashMap<?, ?>) resp.getSessionData().getSessionVariables().get("apRequest");
-			if (idpRequest == null) {
-				LOG.error("no idpRequest found in session" + sealSessionId);
-				return "redirect:/authfail";
-			} else {
-				return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
-			}
+			return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
 		} else {
 			LOG.error(resp.getError());
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());

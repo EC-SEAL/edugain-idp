@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HttpSignatureServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.service.impl</a> &gt; <span class="el_source">HttpSignatureServiceImpl.java</span></div><h1>HttpSignatureServiceImpl.java</h1><pre class="source lang-java linenums">package eu.seal.idp.service.impl;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.seal.idp.enums.HttpResponseEnum;
+import eu.seal.idp.service.HttpSignatureService;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+import org.tomitribe.auth.signatures.Algorithm;
+import org.tomitribe.auth.signatures.Signature;
+import org.tomitribe.auth.signatures.Signer;
+import org.tomitribe.auth.signatures.Verifier;
+
+/**
+ *
+ * @author nikos
+ */
+public class HttpSignatureServiceImpl implements HttpSignatureService {
+
+<span class="nc" id="L50">    private Algorithm algorithm = Algorithm.RSA_SHA256;</span>
+    private Signer signer;
+<span class="nc" id="L52">    private final static Logger log = LoggerFactory.getLogger(HttpSignatureServiceImpl.class);</span>
+
+<span class="nc" id="L54">    public static String[] requiredHeaders = {&quot;(request-target)&quot;, &quot;host&quot;, &quot;original-date&quot;, &quot;digest&quot;, &quot;x-request-id&quot;};</span>
+    private static final String DATE_FORMAT = &quot;EEE, dd MMM yyyy HH:mm:ss z&quot;;
+<span class="nc" id="L56">    private static final int DATE_DIFF_ALLOWED = 5;</span>
+
+    private Key siginingKey;
+    private String keyId;
+
+<span class="nc" id="L61">    public HttpSignatureServiceImpl(String keyId, Key signingKey)</span>
+            throws InvalidKeySpecException, IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        try {
+<span class="nc" id="L64">            this.keyId = keyId;</span>
+<span class="nc" id="L65">            this.siginingKey = signingKey;</span>
+<span class="nc" id="L66">            this.signer = new Signer(this.siginingKey, new Signature(this.keyId, algorithm, null, &quot;(request-target)&quot;, &quot;host&quot;, &quot;original-date&quot;, &quot;digest&quot;, &quot;x-request-id&quot;));</span>
+<span class="nc" id="L67">        } catch (Exception e) {</span>
+<span class="nc" id="L68">            log.error(e.getMessage());</span>
+        }
+<span class="nc" id="L70">    }</span>
+
+    public String getFakeSignature() throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, IOException {
+
+<span class="nc" id="L74">        final String method = &quot;GET&quot;;</span>
+<span class="nc" id="L75">        final String uri = &quot;/foo/Bar&quot;;</span>
+<span class="nc" id="L76">        final Map&lt;String, String&gt; headers = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L77">        headers.put(&quot;host&quot;, &quot;example.org&quot;);</span>
+<span class="nc" id="L78">        headers.put(&quot;original-date&quot;, &quot;Tue, 07 Jun 2014 20:51:35 GMT&quot;);</span>
+<span class="nc" id="L79">        headers.put(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L80">        headers.put(&quot;digest&quot;, &quot;SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=&quot;);</span>
+<span class="nc" id="L81">        headers.put(&quot;Accept&quot;, &quot;*/*&quot;);</span>
+<span class="nc" id="L82">        headers.put(&quot;Content-Length&quot;, &quot;18&quot;);</span>
+<span class="nc" id="L83">        headers.put(&quot;x-request-id&quot;, UUID.randomUUID().toString());</span>
+        // Here it is!
+//        String fingerPrint = DigestUtils.sha256Hex(this.keyServ.getHttpSigPublicKey().getEncoded());
+<span class="nc" id="L86">        final Signature signed = getSigner(this.siginingKey, this.keyId).sign(method, uri, headers);</span>
+<span class="nc" id="L87">        return signed.toString();</span>
+    }
+
+    public String getX509PubKeytoRSABinaryFormat(PublicKey key) throws IOException, KeyStoreException {
+<span class="nc" id="L91">        return Base64.getEncoder().encodeToString(key.getEncoded());</span>
+    }
+
+    @Override
+    public String generateSignature(String hostUrl, String method, String uri, Object postParams, String contentType, String requestId)
+            throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, UnsupportedEncodingException, IOException {
+
+<span class="nc" id="L98">        final Map&lt;String, String&gt; signatureHeaders = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L99">        signatureHeaders.put(&quot;host&quot;, hostUrl);</span>
+<span class="nc" id="L100">        Date date = new Date();</span>
+<span class="nc" id="L101">        SimpleDateFormat formatter = new SimpleDateFormat(&quot;EEE, d MMM YYYY HH:mm:ss z&quot;, Locale.US);</span>
+<span class="nc" id="L102">        formatter.setTimeZone(TimeZone.getTimeZone(&quot;GMT&quot;));</span>
+<span class="nc" id="L103">        String nowDate = formatter.format(date);</span>
+<span class="nc" id="L104">        signatureHeaders.put(&quot;original-date&quot;, nowDate);</span>
+<span class="nc" id="L105">        signatureHeaders.put(&quot;Content-Type&quot;, contentType);</span>
+
+        byte[] digest;
+<span class="nc bnc" id="L108" title="All 4 branches missed.">        if (postParams != null &amp;&amp; contentType.contains(&quot;application/json&quot;)) {</span>
+<span class="nc" id="L109">            ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L110">            String updateString = mapper.writeValueAsString(postParams);</span>
+<span class="nc" id="L111">            digest = MessageDigest.getInstance(&quot;SHA-256&quot;).digest(updateString.getBytes());</span>
+<span class="nc" id="L112">        } else {</span>
+<span class="nc bnc" id="L113" title="All 6 branches missed.">            if (postParams != null &amp;&amp; contentType.contains(&quot;x-www-form-urlencoded&quot;) &amp;&amp; postParams instanceof Map) {</span>
+<span class="nc" id="L114">                digest = MessageDigest.getInstance(&quot;SHA-256&quot;).digest(getParamsString((Map&lt;String, String&gt;) postParams).getBytes());</span>
+<span class="nc" id="L115">            } else {</span>
+<span class="nc" id="L116">                digest = MessageDigest.getInstance(&quot;SHA-256&quot;).digest(&quot;&quot;.getBytes());</span>
+            }
+        }
+<span class="nc" id="L119">        signatureHeaders.put(&quot;digest&quot;, &quot;SHA-256=&quot; + new String(org.tomitribe.auth.signatures.Base64.encodeBase64(digest)));</span>
+<span class="nc" id="L120">        signatureHeaders.put(&quot;Accept&quot;, &quot;*/*&quot;);</span>
+<span class="nc" id="L121">        signatureHeaders.put(&quot;Content-Length&quot;, Integer.toString(digest.length));</span>
+<span class="nc" id="L122">        signatureHeaders.put(&quot;x-request-id&quot;, requestId);</span>
+<span class="nc" id="L123">        signatureHeaders.put(&quot;(request-target)&quot;, method + &quot; &quot; + uri);</span>
+
+<span class="nc" id="L125">        Algorithm algorithm = Algorithm.RSA_SHA256;</span>
+<span class="nc" id="L126">        Signer signer = new Signer(this.siginingKey, new Signature(this.keyId, algorithm, null, &quot;(request-target)&quot;, &quot;host&quot;, &quot;original-date&quot;, &quot;digest&quot;, &quot;x-request-id&quot;));</span>
+<span class="nc" id="L127">        Signature signed = signer.sign(method, uri, signatureHeaders); //getSigner(this.siginingKey, this.keyId).sign(method, uri, signatureHeaders);</span>
+<span class="nc" id="L128">        return signed.toString();</span>
+    }
+
+    @Override
+    public HttpResponseEnum verifySignature(HttpServletRequest httpRequest, Optional&lt;PublicKey&gt; publicKeyToCheckWith) {
+<span class="nc" id="L133">        String authorization = httpRequest.getHeader(&quot;authorization&quot;);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (authorization != null) {</span>
+<span class="nc" id="L135">            final Signature sigToVerify = Signature.fromString(authorization);</span>
+<span class="nc" id="L136">            log.info(&quot;HTTP Signature received: &quot; + sigToVerify);</span>
+            /* check request contains all mandatory headers
+             */
+<span class="nc" id="L139">            boolean emptyRequiredHeader</span>
+<span class="nc" id="L140">                    = sigToVerify.getHeaders()</span>
+<span class="nc" id="L141">                            .stream()</span>
+<span class="nc" id="L142">                            .anyMatch(headerName -&gt; {</span>
+<span class="nc bnc" id="L143" title="All 4 branches missed.">                                return StringUtils.isEmpty(httpRequest.getHeader(headerName)) &amp;&amp; !(headerName.equals(&quot;(request-target)&quot;));</span>
+                            });
+            /* Verify that all the required headers are signed (i.e. are part of the http signature)
+                and that all the signed headers are present in the request
+             */
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            if (!sigToVerify.getHeaders().containsAll(Arrays.asList(requiredHeaders))</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">                    || emptyRequiredHeader) {</span>
+<span class="nc" id="L150">                log.error(&quot;error header is missing!!!&quot;);</span>
+<span class="nc" id="L151">                return HttpResponseEnum.HEADER_MISSING;</span>
+            }
+
+<span class="nc" id="L154">            final Map&lt;String, String&gt; headers = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L155">            Collections.list(httpRequest.getHeaderNames())</span>
+<span class="nc" id="L156">                    .stream().forEach(hName -&gt; {</span>
+<span class="nc" id="L157">                        headers.put(hName, httpRequest.getHeader(hName));</span>
+<span class="nc" id="L158">                    });</span>
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            final String clientTime = StringUtils.isEmpty(httpRequest.getHeader(&quot;date&quot;))</span>
+<span class="nc" id="L161">                    ? httpRequest.getHeader(&quot;original-date&quot;) : httpRequest.getHeader(&quot;date&quot;);</span>
+
+            try {
+                //TODO blacklist requestIds to remove replay attacks?
+//                String requestId = UUID.fromString(httpRequest.getHeader(&quot;x-request-id&quot;)).toString();
+<span class="nc bnc" id="L166" title="All 2 branches missed.">                if (!hasValidRequestTime(clientTime)) {</span>
+<span class="nc" id="L167">                    return HttpResponseEnum.BAD_REQUEST;</span>
+                }
+<span class="nc" id="L169">                final byte[] requestBodyRaw = IOUtils.toByteArray(httpRequest.getInputStream());</span>
+<span class="nc" id="L170">                final byte[] digest = MessageDigest.getInstance(&quot;SHA-256&quot;).digest(requestBodyRaw);</span>
+<span class="nc" id="L171">                final String digestCalculated = new String(Base64.getEncoder().encodeToString(digest));</span>
+
+<span class="nc bnc" id="L173" title="All 2 branches missed.">                if (!areDigestsEqual(httpRequest.getHeader(&quot;digest&quot;), digestCalculated)) {</span>
+<span class="nc" id="L174">                    log.error(&quot;Digest missmatch&quot;);</span>
+<span class="nc" id="L175">                    return HttpResponseEnum.UN_AUTHORIZED;</span>
+                }
+
+<span class="nc" id="L178">                String method = httpRequest.getMethod().toLowerCase();</span>
+<span class="nc" id="L179">                String uri = httpRequest.getRequestURI();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                if (!StringUtils.isEmpty(httpRequest.getQueryString())) {</span>
+<span class="nc" id="L181">                    uri += &quot;?&quot; + httpRequest.getQueryString();</span>
+                }
+<span class="nc" id="L183">                log.debug(&quot;Veryfing signature for &quot; + uri + &quot; and verb &quot; + method);</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">                if (isSignatureValid(sigToVerify, publicKeyToCheckWith, method, uri, headers)) {</span>
+<span class="nc" id="L186">                    return HttpResponseEnum.AUTHORIZED;</span>
+                } else {
+<span class="nc" id="L188">                    log.error(&quot;could not verify signature!! from library method: &quot; + method + &quot; uri: &quot; + uri);</span>
+                }
+<span class="nc" id="L190">                return HttpResponseEnum.UN_AUTHORIZED;</span>
+
+<span class="nc" id="L192">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L193">                log.error(&quot;Wrong request ID&quot;);</span>
+<span class="nc" id="L194">                log.error(e.getMessage());</span>
+<span class="nc" id="L195">                return HttpResponseEnum.BAD_REQUEST;</span>
+<span class="nc" id="L196">            } catch (ParseException ex) {</span>
+<span class="nc" id="L197">                log.error(&quot;Error parsing date&quot;);</span>
+<span class="nc" id="L198">                log.error(ex.getMessage());</span>
+<span class="nc" id="L199">                return HttpResponseEnum.BAD_REQUEST;</span>
+<span class="nc" id="L200">            } catch (IOException ex) {</span>
+<span class="nc" id="L201">                log.error(&quot;ERROR getting request content&quot;);</span>
+<span class="nc" id="L202">                log.error(ex.getMessage());</span>
+<span class="nc" id="L203">                return HttpResponseEnum.BAD_REQUEST;</span>
+<span class="nc" id="L204">            } catch (NoSuchAlgorithmException ex) {</span>
+<span class="nc" id="L205">                log.error(ex.getMessage());</span>
+<span class="nc" id="L206">                return HttpResponseEnum.UN_AUTHORIZED;</span>
+<span class="nc" id="L207">            } catch (InvalidKeyException ex) {</span>
+<span class="nc" id="L208">                log.error(ex.getMessage());</span>
+<span class="nc" id="L209">                return HttpResponseEnum.UN_AUTHORIZED;</span>
+<span class="nc" id="L210">            } catch (InvalidKeySpecException ex) {</span>
+<span class="nc" id="L211">                log.error(ex.getMessage());</span>
+<span class="nc" id="L212">                return HttpResponseEnum.UN_AUTHORIZED;</span>
+<span class="nc" id="L213">            } catch (SignatureException ex) {</span>
+<span class="nc" id="L214">                log.error(ex.getMessage());</span>
+<span class="nc" id="L215">                return HttpResponseEnum.UN_AUTHORIZED;</span>
+            }
+        }
+<span class="nc" id="L218">        return HttpResponseEnum.UN_AUTHORIZED;</span>
+    }
+
+    public boolean hasValidRequestTime(String receivedTime) throws ParseException {
+<span class="nc" id="L222">        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT, Locale.US);</span>
+<span class="nc" id="L223">        format.setTimeZone(TimeZone.getTimeZone(&quot;GMT&quot;));</span>
+<span class="nc" id="L224">        final Date timeServer = new Date();</span>
+<span class="nc" id="L225">        final Date timeClient = format.parse(receivedTime);</span>
+<span class="nc" id="L226">        long diff = Math.abs(timeClient.getTime() - timeServer.getTime());</span>
+<span class="nc" id="L227">        long diffMinutes = diff / (60 * 1000) % 60;</span>
+//        return true;
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        return diffMinutes &lt; DATE_DIFF_ALLOWED;</span>
+    }
+
+    public boolean areDigestsEqual(String requestDigest, String calculatedDigest) {
+        String reqDigestSha256;
+<span class="nc" id="L234">        Pattern p = Pattern.compile(&quot;SHA-256=([^,$]+)&quot;);</span>
+<span class="nc" id="L235">        Matcher m = p.matcher(requestDigest);</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (m.find()) {</span>
+<span class="nc" id="L237">            reqDigestSha256 = m.group(1);</span>
+<span class="nc" id="L238">            log.info(&quot;Extracted SHA-256 digest: &quot; + reqDigestSha256);</span>
+<span class="nc" id="L239">        } else {</span>
+<span class="nc" id="L240">            return false;</span>
+        }
+<span class="nc" id="L242">        return calculatedDigest.equals(reqDigestSha256);</span>
+    }
+
+    public boolean isSignatureValid(Signature sigToVerify,
+            Optional&lt;PublicKey&gt; publicKeyToCheckWith, String method, String uri, Map&lt;String, String&gt; headers) throws InvalidKeyException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException {
+<span class="nc" id="L247">        log.info(&quot;URI &quot; + uri);</span>
+<span class="nc" id="L248">        log.info(&quot;Method &quot; + method);</span>
+<span class="nc" id="L249">        log.info(headers.get(&quot;original-date&quot;) + &quot;Original-date&quot;);</span>
+
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        if (publicKeyToCheckWith.isPresent()) {</span>
+<span class="nc" id="L252">            final Verifier verifier = new Verifier(publicKeyToCheckWith.get(), sigToVerify);</span>
+<span class="nc" id="L253">            return verifier.verify(method, uri, headers);</span>
+        } else {
+<span class="nc" id="L255">            log.error(&quot;could not find sender key!&quot;);</span>
+        }
+<span class="nc" id="L257">        return false;</span>
+    }
+
+    public static String getParamsString(Map&lt;String, String&gt; params)
+            throws UnsupportedEncodingException {
+<span class="nc" id="L262">        StringBuilder result = new StringBuilder();</span>
+
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        for (Map.Entry&lt;String, String&gt; entry : params.entrySet()) {</span>
+<span class="nc" id="L265">            result.append(URLEncoder.encode(entry.getKey(), &quot;UTF-8&quot;));</span>
+<span class="nc" id="L266">            result.append(&quot;=&quot;);</span>
+<span class="nc" id="L267">            result.append(URLEncoder.encode(entry.getValue(), &quot;UTF-8&quot;));</span>
+<span class="nc" id="L268">            result.append(&quot;&amp;&quot;);</span>
+        }
+<span class="nc" id="L270">        String resultString = result.toString();</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        return resultString.length() &gt; 0</span>
+<span class="nc" id="L272">                ? resultString.substring(0, resultString.length() - 1)</span>
+<span class="nc" id="L273">                : resultString;</span>
+    }
+
+    private Signer getSigner(Key sigingKey, String keyId) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, IOException {
+<span class="nc bnc" id="L277" title="All 2 branches missed.">        if (this.signer == null) {</span>
+<span class="nc" id="L278">            signer = new Signer(sigingKey, new Signature(keyId, algorithm, null, &quot;(request-target)&quot;, &quot;host&quot;, &quot;original-date&quot;, &quot;digest&quot;, &quot;x-request-id&quot;));</span>
+        }
+<span class="nc" id="L280">        return signer;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

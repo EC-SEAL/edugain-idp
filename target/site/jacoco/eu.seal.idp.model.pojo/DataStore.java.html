@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Seal Edugain IDP connector</a> &gt; <a href="index.source.html" class="el_package">eu.seal.idp.model.pojo</a> &gt; <span class="el_source">DataStore.java</span></div><h1>DataStore.java</h1><pre class="source lang-java linenums">package eu.seal.idp.model.pojo;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+
+
+<span class="nc" id="L13">public class DataStore   {</span>
+  @JsonProperty(&quot;id&quot;)
+<span class="nc" id="L15">  private String id = null;</span>
+
+  @JsonProperty(&quot;encryptedData&quot;)
+<span class="nc" id="L18">  private String encryptedData = null;</span>
+
+  @JsonProperty(&quot;signature&quot;)
+<span class="nc" id="L21">  private String signature = null;</span>
+
+  @JsonProperty(&quot;signatureAlgorithm&quot;)
+<span class="nc" id="L24">  private String signatureAlgorithm = null;</span>
+
+  @JsonProperty(&quot;encryptionAlgorithm&quot;)
+<span class="nc" id="L27">  private String encryptionAlgorithm = null;</span>
+
+  @JsonProperty(&quot;clearData&quot;)
+  @Valid
+<span class="nc" id="L31">  private List&lt;DataSet&gt; clearData = null;</span>
+
+  public DataStore id(String id) {
+<span class="nc" id="L34">    this.id = id;</span>
+<span class="nc" id="L35">    return this;</span>
+  }
+
+  /**
+   * Unique identifier of the set
+   * @return id 
+   * 
+  **/
+
+
+  public String getId() {
+<span class="nc" id="L46">    return id;</span>
+  }
+
+  public void setId(String id) {
+<span class="nc" id="L50">    this.id = id;</span>
+<span class="nc" id="L51">  }</span>
+
+  public DataStore encryptedData(String encryptedData) {
+<span class="nc" id="L54">    this.encryptedData = encryptedData;</span>
+<span class="nc" id="L55">    return this;</span>
+  }
+
+  /**
+   * If the data store is encrypted, this will be set. B64 string
+   * @return encryptedData
+  **/
+  
+  public String getEncryptedData() {
+<span class="nc" id="L64">    return encryptedData;</span>
+  }
+
+  public void setEncryptedData(String encryptedData) {
+<span class="nc" id="L68">    this.encryptedData = encryptedData;</span>
+<span class="nc" id="L69">  }</span>
+
+  public DataStore signature(String signature) {
+<span class="nc" id="L72">    this.signature = signature;</span>
+<span class="nc" id="L73">    return this;</span>
+  }
+
+  /**
+   * If the data store is signed, signature goes here. B64 string. Sign always the decrypted dataset.
+   * @return signature
+  **/
+
+  public String getSignature() {
+<span class="nc" id="L82">    return signature;</span>
+  }
+
+  public void setSignature(String signature) {
+<span class="nc" id="L86">    this.signature = signature;</span>
+<span class="nc" id="L87">  }</span>
+
+  public DataStore signatureAlgorithm(String signatureAlgorithm) {
+<span class="nc" id="L90">    this.signatureAlgorithm = signatureAlgorithm;</span>
+<span class="nc" id="L91">    return this;</span>
+  }
+
+  /**
+   * Descriptor of the signature algorithm used.
+   * @return signatureAlgorithm
+  **/
+
+  public String getSignatureAlgorithm() {
+<span class="nc" id="L100">    return signatureAlgorithm;</span>
+  }
+
+  public void setSignatureAlgorithm(String signatureAlgorithm) {
+<span class="nc" id="L104">    this.signatureAlgorithm = signatureAlgorithm;</span>
+<span class="nc" id="L105">  }</span>
+
+  public DataStore encryptionAlgorithm(String encryptionAlgorithm) {
+<span class="nc" id="L108">    this.encryptionAlgorithm = encryptionAlgorithm;</span>
+<span class="nc" id="L109">    return this;</span>
+  }
+
+  /**
+   * Descriptor of the encryption algorithm used.
+   * @return encryptionAlgorithm
+  **/
+
+
+  public String getEncryptionAlgorithm() {
+<span class="nc" id="L119">    return encryptionAlgorithm;</span>
+  }
+
+  public void setEncryptionAlgorithm(String encryptionAlgorithm) {
+<span class="nc" id="L123">    this.encryptionAlgorithm = encryptionAlgorithm;</span>
+<span class="nc" id="L124">  }</span>
+
+  public DataStore clearData(List&lt;DataSet&gt; clearData) {
+<span class="nc" id="L127">    this.clearData = clearData;</span>
+<span class="nc" id="L128">    return this;</span>
+  }
+
+  public DataStore addClearDataItem(DataSet clearDataItem) {
+<span class="nc bnc" id="L132" title="All 2 branches missed.">    if (this.clearData == null) {</span>
+<span class="nc" id="L133">      this.clearData = new ArrayList&lt;DataSet&gt;();</span>
+    }
+<span class="nc" id="L135">    this.clearData.add(clearDataItem);</span>
+<span class="nc" id="L136">    return this;</span>
+  }
+
+  /**
+   * If the data store is in cleartext, this will be set
+   * @return clearData
+  **/
+
+  @Valid
+
+  public List&lt;DataSet&gt; getClearData() {
+<span class="nc" id="L147">    return clearData;</span>
+  }
+
+  public void setClearData(List&lt;DataSet&gt; clearData) {
+<span class="nc" id="L151">    this.clearData = clearData;</span>
+<span class="nc" id="L152">  }</span>
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L158">      return true;</span>
+    }
+<span class="nc bnc" id="L160" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L161">      return false;</span>
+    }
+<span class="nc" id="L163">    DataStore dataStore = (DataStore) o;</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">    return Objects.equals(this.id, dataStore.id) &amp;&amp;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        Objects.equals(this.encryptedData, dataStore.encryptedData) &amp;&amp;</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        Objects.equals(this.signature, dataStore.signature) &amp;&amp;</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        Objects.equals(this.signatureAlgorithm, dataStore.signatureAlgorithm) &amp;&amp;</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        Objects.equals(this.encryptionAlgorithm, dataStore.encryptionAlgorithm) &amp;&amp;</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        Objects.equals(this.clearData, dataStore.clearData);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L174">    return Objects.hash(id, encryptedData, signature, signatureAlgorithm, encryptionAlgorithm, clearData);</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L179">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L180">    sb.append(&quot;class DataStore {\n&quot;);</span>
+    
+<span class="nc" id="L182">    sb.append(&quot;    id: &quot;).append(toIndentedString(id)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L183">    sb.append(&quot;    encryptedData: &quot;).append(toIndentedString(encryptedData)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L184">    sb.append(&quot;    signature: &quot;).append(toIndentedString(signature)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L185">    sb.append(&quot;    signatureAlgorithm: &quot;).append(toIndentedString(signatureAlgorithm)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L186">    sb.append(&quot;    encryptionAlgorithm: &quot;).append(toIndentedString(encryptionAlgorithm)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L187">    sb.append(&quot;    clearData: &quot;).append(toIndentedString(clearData)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L188">    sb.append(&quot;}&quot;);</span>
+<span class="nc" id="L189">    return sb.toString();</span>
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+<span class="nc bnc" id="L197" title="All 2 branches missed.">    if (o == null) {</span>
+<span class="nc" id="L198">      return &quot;null&quot;;</span>
+    }
+<span class="nc" id="L200">    return o.toString().replace(&quot;\n&quot;, &quot;\n    &quot;);</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
