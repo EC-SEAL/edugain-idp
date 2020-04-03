@@ -7,7 +7,7 @@ public class AttributeType {
     private String friendlyName;
     private String encoding;
     private String language;
-    private boolean isMandatory;
+    private boolean mandatory;
     private String[] values;
     
     
@@ -15,12 +15,12 @@ public class AttributeType {
     public AttributeType() {
     }
 
-    public AttributeType(String name, String friendlyName, String encoding, String language, boolean isMandatory, String[] values) {
+    public AttributeType(String name, String friendlyName, String encoding, String language, boolean mandatory, String[] values) {
         this.name = name;
         this.friendlyName = friendlyName;
         this.encoding = encoding;
         this.language = language;
-        this.isMandatory = isMandatory;
+        this.mandatory = mandatory;
         this.values = values;
     }
 
@@ -56,12 +56,12 @@ public class AttributeType {
         this.language = language;
     }
 
-    public boolean isIsMandatory() {
-        return isMandatory;
+    public boolean mandatory() {
+        return mandatory;
     }
 
-    public void setIsMandatory(boolean isMandatory) {
-        this.isMandatory = isMandatory;
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
     }
 
     public String[] getValues() {
@@ -74,10 +74,8 @@ public class AttributeType {
 
     @Override
     public String toString() {
-        return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", isMandatory=" + isMandatory + ", values=" + values + '}';
+        return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", mandatory=" + mandatory + ", values=" + values + '}';
     }
-    
-    
     
     
     

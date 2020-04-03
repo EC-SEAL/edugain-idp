@@ -23,6 +23,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -82,15 +83,14 @@ public class ISController {
 		ObjectMapper mapper = new ObjectMapper();
 		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
 		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
-
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			String sealSessionId = resp.getSessionData().getSessionId();
-			return "redirect:/saml/login?session=" + sealSessionId + "&callback=/is/callback";
+			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/is/callback";
+			return "redirect:" + redirectUri;
 		} else {
-			LOG.error(resp.getError());
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
 		}
-
+		LOG.info("LOST");
 		return "redirect:/saml/login";
 	}
 }
