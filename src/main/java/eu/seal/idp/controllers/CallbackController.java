@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -89,7 +90,7 @@ public class CallbackController {
 		// Recover Session ID
 		SessionMngrResponse smResp = (new ObjectMapper()).readValue(clearSmResp, SessionMngrResponse.class);
 		String recoveredSessionID = smResp.getSessionData().getSessionId(); 
-		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
 
 		// Recover DataStore
 		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
