@@ -33,10 +33,12 @@ import org.apache.commons.logging.Log;
 import org.slf4j.Logger;	
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -74,6 +76,7 @@ public class ISController {
 	 * @throws JsonParseException 
 	 */
 
+	
 	@RequestMapping(value = {"/is/query"}, method = {RequestMethod.POST, RequestMethod.GET})
 	public String query(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
@@ -82,16 +85,18 @@ public class ISController {
 		requestParams.add(new NameValuePair("token", msToken));
 		ObjectMapper mapper = new ObjectMapper();
 		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
+		LOG.info("This is rspValidate" + rspValidate);
 		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
 		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
 			String sealSessionId = resp.getSessionData().getSessionId();
 			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/is/callback";
+			LOG.info("About to redirect to: " + redirectUri);
 			return "redirect:" + redirectUri;
-		} else {
-			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
 		}
-		LOG.info("LOST");
-		return "redirect:/saml/login";
+		redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
+		LOG.info("The query was not properly done. This is resp code: " + resp.getCode().toString() + " \n + The error log: " + resp.getError());
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request: " + "Error validating token! " + resp.getError());
+		
 	}
 }
 

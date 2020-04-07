@@ -468,7 +468,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         		.addFilterBefore(samlFilter(), CsrfFilter.class);
         http        
             .authorizeRequests()
-           		.antMatchers("*").permitAll()
            		.antMatchers("/as/*").permitAll()
            		.antMatchers("/is/*").permitAll()
            		.antMatchers("/start/**").permitAll()
@@ -476,8 +475,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
            		.antMatchers("/saml/**").permitAll()
            		.antMatchers("/css/**").permitAll()
            		.antMatchers("/img/**").permitAll()
-           		.antMatchers("/js/**").permitAll()
-           		.anyRequest().authenticated();
+           		.antMatchers("/js/**").permitAll();
         http
         		.logout()
         			.disable();	// The logout procedure is already handled by SAML filters.

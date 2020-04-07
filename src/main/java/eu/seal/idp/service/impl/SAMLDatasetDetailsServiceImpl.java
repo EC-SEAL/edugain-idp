@@ -25,8 +25,6 @@ public class SAMLDatasetDetailsServiceImpl {
 	public DataSet loadDatasetBySAML(String dsId, SAMLCredential credential)
 			throws UsernameNotFoundException {
 		
-		//dataSet.setLoa(user.getLoa()); To be set 
-        //dataSet.setIssued(id);
 		SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM YYYY HH:mm:ss z", Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = new Date();
