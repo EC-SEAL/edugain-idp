@@ -90,7 +90,6 @@ public class ISController {
 		} else {
 			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
 		}
-		LOG.info("LOST");
 		return "redirect:/saml/login";
 	}
 }
