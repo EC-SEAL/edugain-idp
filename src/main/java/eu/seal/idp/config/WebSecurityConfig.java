@@ -194,11 +194,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public KeyManager keyManager() {
         DefaultResourceLoader loader = new DefaultResourceLoader();
         Resource storeFile = loader
-                .getResource("classpath:/saml/samlKeystore.jks");
-        String storePass = System.getenv("KEYSTORE_PASS");
+                .getResource(System.getenv("SAML_KEYSTORE_PATH"));
+        String storePass = System.getenv("SAML_KEYSTORE_PASS");
         Map<String, String> passwords = new HashMap<String, String>();
-        passwords.put(System.getenv("KEYSTORE_ID"), System.getenv("KEYSTORE_PASS"));
-        String defaultKey = System.getenv("KEYSTORE_ID");
+        passwords.put(System.getenv("SAML_KEYSTORE_ID"), System.getenv("SAML_KEYSTORE_PASS"));
+        String defaultKey = System.getenv("SAML_KEYSTORE_ID");
         return new JKSKeyManager(storeFile, storePass, passwords, defaultKey);
     }
     
@@ -470,6 +470,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
             .authorizeRequests()
            		.antMatchers("*").permitAll()
            		.antMatchers("/as/*").permitAll()
+           		.antMatchers("/is/*").permitAll()
            		.antMatchers("/start/**").permitAll()
            		.antMatchers("/generate/*").permitAll()
            		.antMatchers("/saml/**").permitAll()

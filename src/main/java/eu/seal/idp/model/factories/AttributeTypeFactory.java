@@ -19,7 +19,7 @@ public class AttributeTypeFactory {
             AttributeType type = new AttributeType();
             type.setEncoding("en");
             type.setFriendlyName(attr.getFriendlyName());
-            type.setIsMandatory(true);
+            type.setMandatory(true);
             type.setLanguage("en");
 
             if (attr.getAttributeValues().get(0) instanceof XSStringImpl) {
