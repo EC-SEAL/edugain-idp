@@ -194,7 +194,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public KeyManager keyManager() {
         DefaultResourceLoader loader = new DefaultResourceLoader();
         Resource storeFile = loader
-                .getResource("classpath:/saml/your_site_name.jks");
+                .getResource(System.getenv("SAML_KEYSTORE_PATH"));
         String storePass = System.getenv("SAML_KEYSTORE_PASS");
         Map<String, String> passwords = new HashMap<String, String>();
         passwords.put(System.getenv("SAML_KEYSTORE_ID"), System.getenv("SAML_KEYSTORE_PASS"));
