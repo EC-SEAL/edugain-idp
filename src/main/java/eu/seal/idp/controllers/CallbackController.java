@@ -83,7 +83,7 @@ public class CallbackController {
 		authentication.getDetails();
 		SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();	
 		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
-		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
 
 		// Recover DataStore
 		String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
@@ -141,8 +141,14 @@ public class CallbackController {
 		netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReqMetadata, "application/json", 1);
 		
 		// Redirect to Callback Address
-		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("clientCallbackAddr");
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
 		return new ModelAndView("redirect:" + callBackAddr); 
 	}
+	
+	
+	
+	
+	
+	
 
 }
