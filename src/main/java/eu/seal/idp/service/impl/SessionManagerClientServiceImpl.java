@@ -24,16 +24,17 @@ import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.KeyStoreService;
 import eu.seal.idp.service.NetworkService;
+import eu.seal.idp.service.SessionManagerClientService;
 
-public class SessionManagerClientImpl {
+public class SessionManagerClientServiceImpl implements SessionManagerClientService {
 	
-	private final static Logger LOG = LoggerFactory.getLogger(SessionManagerClientImpl.class);
+	private final static Logger LOG = LoggerFactory.getLogger(SessionManagerClientServiceImpl.class);
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 	private final String sessionMngrURL;
 	ObjectMapper mapper = new ObjectMapper();
 	
-	public SessionManagerClientImpl(KeyStoreService keyServ, String sessionMngrURL) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+	public SessionManagerClientServiceImpl(KeyStoreService keyServ, String sessionMngrURL) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		this.sessionMngrURL = sessionMngrURL;
 		Key signingKey = this.keyServ.getSigningKey();
@@ -42,12 +43,19 @@ public class SessionManagerClientImpl {
 		this.netServ = new NetworkServiceImpl(httpSigServ);
 	}
 	
-	public SessionMngrResponse validateToken(String param, String msToken) throws NoSuchAlgorithmException, IOException {
-		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-		requestParams.add(new NameValuePair("token", msToken));
-		ObjectMapper mapper = new ObjectMapper();
-		String rspValidate = netServ.sendGet(sessionMngrURL, "/sm/validateToken", requestParams, 1);
-		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
+	public SessionMngrResponse validateToken(String param, String msToken) {
+		SessionMngrResponse resp = new SessionMngrResponse();
+		try {
+			List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+			requestParams.add(new NameValuePair("token", msToken));
+			ObjectMapper mapper = new ObjectMapper();
+			String rspValidate = netServ.sendGet(sessionMngrURL, "/sm/validateToken", requestParams, 1);
+			resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 		return resp;
 	}
 	
