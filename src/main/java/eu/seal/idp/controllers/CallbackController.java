@@ -40,7 +40,7 @@ import eu.seal.idp.service.impl.DataStoreServiceImpl;
 import eu.seal.idp.service.impl.HttpSignatureServiceImpl;
 import eu.seal.idp.service.impl.NetworkServiceImpl;
 import eu.seal.idp.service.impl.SAMLDatasetDetailsServiceImpl;
-import eu.seal.idp.service.impl.SessionManagerClientImpl;
+import eu.seal.idp.service.impl.SessionManagerClientServiceImpl;
 
 @Controller
 public class CallbackController {
@@ -48,7 +48,7 @@ public class CallbackController {
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 	private final SealMetadataService metadataServ;
-	private final SessionManagerClientImpl sessionManagerClient;
+	private final SessionManagerClientServiceImpl sessionManagerClient;
 	private final String sessionManagerURL;
 	// Logger
 	private static final Logger LOG = LoggerFactory
@@ -60,7 +60,7 @@ public class CallbackController {
 		this.keyServ = keyServ;
 		this.metadataServ=metadataServ;
 		this.sessionManagerURL = System.getenv("SESSION_MANAGER_URL");
-		this.sessionManagerClient = new SessionManagerClientImpl(keyServ, sessionManagerURL);
+		this.sessionManagerClient = new SessionManagerClientServiceImpl(keyServ, sessionManagerURL);
 		HttpSignatureService httpSigServ = new HttpSignatureServiceImpl(this.keyServ.getFingerPrint(), this.keyServ.getSigningKey());
 		this.netServ = new NetworkServiceImpl(httpSigServ);
 	}
@@ -132,6 +132,8 @@ public class CallbackController {
 		//Recover Dataset and Metadata
 		DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
 		String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);
+		
+		EntityMetadata metadata = this.metadataServ.getMetadata();
 
 		//UpdateSessionmanager with DSResponse and DSMetadata
 		UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDsResponse);

@@ -43,7 +43,7 @@ In case a SAML identity provider doesn't exist, an it is needed for development 
 In that case,  `IDP_METADATA_URL` can be set by doing:
 
 ```bash
-export IDP_METADATA_URL = KEYCLOACK_URI_KEYCLOAK_PORT/realms/KEY_CLOAK_REALM/protocol/saml/description-
+export IDP_METADATA_URL = KEYCLOACK_URI:KEYCLOAK_PORT/realms/auth/realms/REALM/protocol/saml/descriptor
 ``` 
 
 
