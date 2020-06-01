@@ -71,7 +71,6 @@ public class AuthenticateController {
 	 * @throws NoSuchAlgorithmException 
 	 * @throws JsonMappingException 
 	 * @throws JsonParseException 
-	 */
 
 	@RequestMapping(value = {"/as/authenticate"}, method = {RequestMethod.POST, RequestMethod.GET})
 	public String authenticate(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
@@ -92,5 +91,7 @@ public class AuthenticateController {
 
 		return "redirect:/saml/login";
 	}
+		 */
+
 }
 

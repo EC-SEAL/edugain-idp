@@ -74,7 +74,7 @@ public class ISController {
 	 * @throws JsonParseException 
 	 */
 
-	@RequestMapping(value = {"/is/query"}, method = {RequestMethod.POST, RequestMethod.GET})
+	@RequestMapping(value = {"/is/query", "as/authenticate"}, method = {RequestMethod.POST, RequestMethod.GET})
 	public String query(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
 
