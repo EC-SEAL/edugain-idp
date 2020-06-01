@@ -46,7 +46,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class ISController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(AuthenticateController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ISController.class);
 
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
