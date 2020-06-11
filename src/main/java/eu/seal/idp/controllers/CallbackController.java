@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
 import eu.seal.idp.model.pojo.EntityMetadata;
@@ -77,17 +79,20 @@ public class CallbackController {
 	 * @throws KeyStoreException
 	 */
 	
-	@RequestMapping("/is/callback")
+	@RequestMapping("/callback")
 	@ResponseBody
-	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication) throws NoSuchAlgorithmException, IOException {
+	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
 		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);	
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
-		
-		if(callBackAddr.contains("rm/response")) {
+		if(callBackAddr == null) {
+			callBackAddr = "#";
+			return dataStoreFlow(sessionId, authentication, callBackAddr, model);
+		}
+		else if(callBackAddr.contains("rm/response")) {
 			return dsResponseFlow(sessionId, authentication, callBackAddr);
 		}
 		else { 
-			return dataStoreFlow(sessionId, authentication, callBackAddr);
+			return dataStoreFlow(sessionId, authentication, callBackAddr, model);
 		}
 	}
 	
@@ -112,9 +117,12 @@ public class CallbackController {
 			DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
 			String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);
 			
-	
+			EntityMetadata metadata = this.metadataServ.getMetadata();
+			String stringifiedMetadata = mapper.writeValueAsString(metadata);
+			
+			LOG.info(stringifiedMetadata);	
 			//UpdateSessionmanager with DSResponse and DSMetadata
-			UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDsResponse);
+			UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDsResponse); 
 			//UpdateDataRequest updateReqMetadata = new UpdateDataRequest(sessionId, "dsMetadata", stringifiedDsResponse);
 	
 			netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReqResponse, "application/json", 1);
@@ -124,11 +132,13 @@ public class CallbackController {
 				e.printStackTrace();
 		} catch (IOException e) {
 				e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
 		}
 		return new ModelAndView("redirect:" + callBackAddr); 
 	}
 	
-	public ModelAndView dataStoreFlow(String sessionId, Authentication authentication, String callBackAddr) {
+	public ModelAndView dataStoreFlow(String sessionId, Authentication authentication, String callBackAddr, Model model) {
 		try { 
 			authentication.getDetails();
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();	
@@ -144,6 +154,14 @@ public class CallbackController {
 			rtrDatastore=(new DataStoreServiceImpl()).pushDataSet(rtrDatastore,rtrDataSet);
 			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
 			UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
+			
+			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl()).loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId,credentials);
+			
+			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
+			UpdateDataRequest updateAuthSet = new UpdateDataRequest(sessionId, "authenticationSet", stringifiedAuthenticationSet);
+			
+			
+			netServ.sendPostBody(sessionManagerURL, "/sm/updateSessionData", updateAuthSet, "application/json", 1);
 			netServ.sendPostBody(sessionManagerURL, "/sm/updateSessionData", updateReq, "application/json", 1);
 		} catch (NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
@@ -153,10 +171,18 @@ public class CallbackController {
 				e.printStackTrace();
 		}
 		
+		
 		// Redirect to Callback Address
 		return new ModelAndView("redirect:" + callBackAddr); 	
 		
 	}
+	
+	
+	// AttributeSet
+	// Should be changed to a AttributeSet
+	// AttributeSet --> dsResponse
+	// dsMetadata --> Lo llego a leer pero no lo uso
+	// UC8.02 NO tiene ventana de vuelta
 	
 	
 	
