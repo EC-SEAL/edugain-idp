@@ -1,4 +1,4 @@
-	package eu.seal.idp.controllers;
+package eu.seal.idp.controllers;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
