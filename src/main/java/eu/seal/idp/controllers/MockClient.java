@@ -149,7 +149,7 @@ public class TokenGenerateController {
 		AttributeType[] result = new AttributeType[2];
 		AttributeSetStatus atrSetStatus = new AttributeSetStatus();
 		Map < String, String> metadataProperties = new HashMap();
-		AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
+		//AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
 		String attributeSetString = mapper.writeValueAsString(datastore);
 		
 		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
