@@ -64,8 +64,7 @@ public class SAMLDatasetDetailsServiceImpl {
 	public AttributeSet loadAttributeSetBySAML(String dsId, String inResponseTo, SAMLCredential credential)
 			throws UsernameNotFoundException {
 		
-		AttributeSet attributeSet = new AttributeSet();
-		attributeSet.setId(dsId);
+
 		List <AttributeType> attributes = new ArrayList();
 		AttributeType[] attributeTypeArray = new AttributeType[attributes.size()];
 		List<Attribute> attributesList = credential.getAttributes();
@@ -91,8 +90,8 @@ public class SAMLDatasetDetailsServiceImpl {
 		attrSet.setAttributes(attributes);
 		
 		
-		LOG.info(attributeSet.toString());
-		return attributeSet;
+		LOG.info(attrSet.toString());
+		return attrSet;
 	}
 	
 }

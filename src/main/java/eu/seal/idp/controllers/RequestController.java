@@ -47,16 +47,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  *  */
 
 @Controller
-public class ISController {
+public class RequestController {
 
-	private final static Logger LOG = LoggerFactory.getLogger(ISController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(RequestController.class);
 
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 	private final SealMetadataService metadataServ;
 
 	@Autowired
-	public ISController(KeyStoreService keyServ,
+	public RequestController(KeyStoreService keyServ,
 			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		this.metadataServ=metadataServ;

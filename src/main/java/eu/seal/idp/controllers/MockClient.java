@@ -43,15 +43,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Controllers managing Seal Authentication Source, used in the log in and SSO Callback
  */
 @Controller
-public class TokenGenerateController {
+public class MockClient {
 
-	private final static Logger LOG = LoggerFactory.getLogger(TokenGenerateController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(MockClient.class);
 
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 
 	@Autowired
-	public TokenGenerateController(KeyStoreService keyServ,
+	public MockClient(KeyStoreService keyServ,
 			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		Key signingKey = this.keyServ.getSigningKey();
