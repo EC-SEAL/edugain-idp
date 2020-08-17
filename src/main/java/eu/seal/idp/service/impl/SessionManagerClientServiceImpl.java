@@ -16,8 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+import eu.seal.idp.model.pojo.NewUpdateDataRequest;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
+import eu.seal.idp.model.pojo.UpdateDataRequest;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.KeyStoreService;
 import eu.seal.idp.service.NetworkService;
@@ -28,6 +29,8 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
 	private final static Logger LOG = LoggerFactory.getLogger(SessionManagerClientServiceImpl.class);
 	private final String URIVALIDATE = "/sm/validateToken";
 	private final String URIGETSESSION = "/sm/getSessionData";
+	private final String URIUPDATESESSION = "/sm/updateSessionData";
+	private final String URIUPDATENEWSESSION = "/sm/new/add";
 	
 	private final NetworkService netServ;  
 	private final KeyStoreService keyServ;
@@ -122,4 +125,47 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
 		reqParams.add(new NameValuePair(key, value));
 		return getParams(reqParams);
 	}
+	
+	/**
+	 * Updates a session Variable
+	 * @param key The key of the NameValue
+	 * @param value The value of the  NameValuePair
+	 * @return SessionMngrResponse The response from the SM
+	 */
+	
+	public String updateSessionVariables(String sessionId, String objectId, String variableName, Object updateObject) throws IOException, NoSuchAlgorithmException {
+        ObjectMapper mapper = new ObjectMapper();
+        String stringifiedObject = mapper.writeValueAsString(updateObject);
+
+        UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, variableName, stringifiedObject);
+        SessionMngrResponse resp = mapper.readValue(netServ.sendPostBody(sessionMngrURL, URIUPDATESESSION, updateReq, "application/json", 1), SessionMngrResponse.class);
+        LOG.info("updateSessionData " + resp.getCode().toString());
+        if (!resp.getCode().toString().equals("OK")) {
+            LOG.error("ERROR: " + resp.getError());
+            return "error";
+        }
+        LOG.info("session " + sessionId + " updated LEGACY API Session succesfully  with user attributes " + stringifiedObject);
+
+        if (variableName.equals("dsResponse")) {
+            NewUpdateDataRequest newReq = new NewUpdateDataRequest();
+            newReq.setId(objectId);
+            newReq.setSessionId(sessionId);
+            newReq.setType("dataSet");
+            newReq.setData(stringifiedObject);
+            String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
+            
+            System.out.println("Result" + result);
+            resp = mapper.readValue(result, SessionMngrResponse.class);
+            LOG.info("updateSessionData " + resp.getCode().toString());
+            if (!resp.getCode().toString().equals("OK")) {
+                LOG.error("ERROR: " + resp.getError());
+                return "error";
+            }
+            LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
+        }
+
+        return "ok";
+    }
+	
+	
 }

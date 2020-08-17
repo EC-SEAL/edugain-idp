@@ -2,22 +2,15 @@ package eu.seal.idp.controllers;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +26,6 @@ import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
 import eu.seal.idp.model.pojo.EntityMetadata;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
-import eu.seal.idp.model.pojo.UpdateDataRequest;
 import eu.seal.idp.service.SealMetadataService;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.KeyStoreService;
@@ -46,131 +38,139 @@ import eu.seal.idp.service.impl.SessionManagerClientServiceImpl;
 
 @Controller
 public class CallbackController {
-	
+
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 	private final SealMetadataService metadataServ;
 	private final SessionManagerClientServiceImpl sessionManagerClient;
 	private final String sessionManagerURL;
 	private final String responseSenderID;
-	
-	private String  responseReceiverID;
+
+	private String rmResponseReceiverID;
+	private String clResponseReceiverID;
 
 	ObjectMapper mapper;
 	// Logger
-	private static final Logger LOG = LoggerFactory
-			.getLogger(CallbackController.class);
-	
+	private static final Logger LOG = LoggerFactory.getLogger(CallbackController.class);
+
 	@Autowired
-	public CallbackController(KeyStoreService keyServ,
-			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
+	public CallbackController(KeyStoreService keyServ, SealMetadataService metadataServ)
+			throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException,
+			InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
-		this.metadataServ=metadataServ;
+		this.metadataServ = metadataServ;
 		this.sessionManagerURL = System.getenv("SESSION_MANAGER_URL");
 		this.responseSenderID = System.getenv("RESPONSE_SENDER_ID");
-		this.responseReceiverID = System.getenv("RESPONSE_RECEIVER_ID");
+		this.rmResponseReceiverID = System.getenv("RM_RESPONSE_RECEIVER_ID");
+		this.clResponseReceiverID = System.getenv("CL_RESPONSE_RECEIVER_ID");
 		this.sessionManagerClient = new SessionManagerClientServiceImpl(keyServ, sessionManagerURL);
 		this.mapper = new ObjectMapper();
-		HttpSignatureService httpSigServ = new HttpSignatureServiceImpl(this.keyServ.getFingerPrint(), this.keyServ.getSigningKey());
+		HttpSignatureService httpSigServ = new HttpSignatureServiceImpl(this.keyServ.getFingerPrint(),
+				this.keyServ.getSigningKey());
 		this.netServ = new NetworkServiceImpl(httpSigServ);
 	}
-	
+
 	/**
-	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to the DataStore
-	 * @param session 
+	 * Manages SAML success callback (mapped from /saml/SSO callback) and writes to
+	 * the DataStore
+	 * 
+	 * @param session
 	 * @param authentication
 	 * @param model
 	 * @param redirectAttrs
-	 * @return 
+	 * @return
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * @throws KeyStoreException
 	 */
-	
+
 	@RequestMapping("/callback")
 	@ResponseBody
-	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId, Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
+	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId,
+			Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
 		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
 		LOG.info(smResp.toString());
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
-		if(callBackAddr == null) {
+		if (callBackAddr == null) {
 			callBackAddr = "#";
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
-		}
-		else if(callBackAddr.contains("rm/response")) {
+		} else if (callBackAddr.contains("rm/response")) {
 			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
-		}
-		else { 
+		} else {
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
 		}
 	}
-	
-	
-	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr, Model model) {
+
+	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr,
+			Model model) {
 		authentication.getDetails();
 		try {
-			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();		
-			DataSet receivedDataset = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			String stringifiedDsResponse = mapper.writeValueAsString(receivedDataset);
-			
+			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
+			AttributeSet receivedAttributeSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
+			String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
+
 			EntityMetadata metadata = this.metadataServ.getMetadata();
 			String stringifiedMetadata = mapper.writeValueAsString(metadata);
+
+			LOG.info(stringifiedMetadata);
 			
-			LOG.info(stringifiedMetadata);	
-			UpdateDataRequest updateReqResponse = new UpdateDataRequest(sessionId, "dsResponse", stringifiedDsResponse); 
-			//UpdateDataRequest updateReqMetadata = new UpdateDataRequest(sessionId, "dsMetadata", stringifiedDsResponse);
-	
-			netServ.sendPostBody(sessionManagerURL, "/sm/updateSessionData", updateReqResponse, "application/json", 1);
-			//netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReqMetadata, "application/json", 1);
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
 			
-			
+
 		} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		} catch (IOException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
-		SessionMngrResponse tokenCreate = sessionManagerClient.generateToken(sessionId, responseSenderID, responseReceiverID);
+		SessionMngrResponse tokenCreate = sessionManagerClient.generateToken(sessionId, responseSenderID,
+				rmResponseReceiverID);
+
 		model.addAttribute("callback", callBackAddr);
 		model.addAttribute("msToken", tokenCreate.getAdditionalData());
-		return new ModelAndView("clientRedirect"); 
+		return new ModelAndView("clientRedirect");
 	}
-	
-	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr, Model model) {
-		try { 
+
+	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr,
+			Model model) {
+		try {
 			authentication.getDetails();
-			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();	
+			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
 			// Recover DataStore
 			String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
-		
+
 			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
 			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			rtrDatastore=(new DataStoreServiceImpl()).pushDataSet(rtrDatastore,rtrDataSet);
+			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
 			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
-			UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "dataStore", stringifiedDatastore);
-			
-			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl()).loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId,credentials);
+
+			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
 			LOG.info(authSet.toString());
-			
+
 			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
-			UpdateDataRequest updateAuthSet = new UpdateDataRequest(sessionId, "authenticationSet", stringifiedAuthenticationSet);
+
 			
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore);
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", stringifiedAuthenticationSet);
 			
-			netServ.sendPostBody(sessionManagerURL, "/sm/updateSessionData", updateAuthSet, "application/json", 1);
-			netServ.sendPostBody(sessionManagerURL, "/sm/updateSessionData", updateReq, "application/json", 1);
 		} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		} catch (IOException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		}
-		SessionMngrResponse tokenCreate = sessionManagerClient.generateToken(sessionId, responseSenderID, responseReceiverID);
-		
+		SessionMngrResponse tokenCreate = sessionManagerClient.generateToken(sessionId, responseSenderID,
+				clResponseReceiverID);
+
 		model.addAttribute("callback", callBackAddr);
-        model.addAttribute("msToken", tokenCreate.getAdditionalData());
-		return new ModelAndView("clientRedirect"); 	
-		
+		model.addAttribute("msToken", tokenCreate.getAdditionalData());
+		return new ModelAndView("clientRedirect");
+
 	}
+
 
 }

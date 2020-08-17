@@ -10,6 +10,9 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.opensaml.saml2.core.Attribute;
+import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.schema.XSString;
+import org.opensaml.xml.schema.impl.XSAnyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,6 +56,7 @@ public class SAMLDatasetDetailsServiceImpl {
 			LOG.info("*****_Name" + att.getName());
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
+			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			LOG.info("*****_FriendlyName" + att.getName());
 			dataSet.addAttributesItem(attributeType);
 		}
@@ -81,8 +85,8 @@ public class SAMLDatasetDetailsServiceImpl {
 		AttributeSet attrSet = new AttributeSet();
 		attrSet.setId(UUID.randomUUID().toString());
 		attrSet.setType(TypeEnum.RESPONSE);
-		attrSet.setIssuer("edugainASms_001");
-		attrSet.setRecipient("CLms001");
+		attrSet.setIssuer(System.getenv("RESPONSE_SENDER_ID"));
+		attrSet.setRecipient(System.getenv("CL_RESPONSE_RECEIVER_ID"));
 		attrSet.setInResponseTo(inResponseTo);
 		attrSet.setNotBefore("");
 		attrSet.setNotAfter("");
@@ -92,6 +96,39 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		LOG.info(attrSet.toString());
 		return attrSet;
+	}
+	
+	
+	public String[] getAttributeValuesFromCredential(List<XMLObject> input) {
+		String[] result;
+		ArrayList<String> ar = new ArrayList<String>();
+		input.forEach((v)->{
+			String value = getAttributeValue(v);
+			ar.add(value);
+		});
+		String[] stringArray = ar.toArray(new String[0]);
+		return stringArray;
+	}
+	
+	private String getAttributeValue(XMLObject attributeValue)
+	{
+	    return attributeValue == null ?
+	            null :
+	            attributeValue instanceof XSString ?
+	                    getStringAttributeValue((XSString) attributeValue) :
+	                    attributeValue instanceof XSAnyImpl ?
+	                            getAnyAttributeValue((XSAnyImpl) attributeValue) :
+	                            attributeValue.toString();
+	}
+
+	private String getStringAttributeValue(XSString attributeValue)
+	{
+	    return attributeValue.getValue();
+	}
+
+	private String getAnyAttributeValue(XSAnyImpl attributeValue)
+	{
+	    return attributeValue.getTextContent();
 	}
 	
 }
