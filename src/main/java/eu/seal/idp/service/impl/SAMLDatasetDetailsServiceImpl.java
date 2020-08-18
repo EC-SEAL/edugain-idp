@@ -94,6 +94,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		attrSet.setAttributes(attributes);
 		
 		
+		
 		LOG.info(attrSet.toString());
 		return attrSet;
 	}
