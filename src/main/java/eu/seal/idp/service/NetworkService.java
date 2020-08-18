@@ -14,4 +14,7 @@ public interface NetworkService {
 
     public String sendPostBody(String hostUrl, String uri, Object postBody, String contentType, int attempt) throws IOException, NoSuchAlgorithmException;
 
+	String sendNewPostBody(String hostUrl, String uri, Object postBody, String contentType, int attempt)
+			throws IOException, NoSuchAlgorithmException;
+
 }

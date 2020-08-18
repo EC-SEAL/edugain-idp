@@ -43,15 +43,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Controllers managing Seal Authentication Source, used in the log in and SSO Callback
  */
 @Controller
-public class TokenGenerateController {
+public class MockClient {
 
-	private final static Logger LOG = LoggerFactory.getLogger(TokenGenerateController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(MockClient.class);
 
 	private final NetworkService netServ;
 	private final KeyStoreService keyServ;
 
 	@Autowired
-	public TokenGenerateController(KeyStoreService keyServ,
+	public MockClient(KeyStoreService keyServ,
 			SealMetadataService metadataServ) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedEncodingException, InvalidKeySpecException, IOException {
 		this.keyServ = keyServ;
 		Key signingKey = this.keyServ.getSigningKey();
@@ -117,7 +117,7 @@ public class TokenGenerateController {
 		AttributeType[] result = new AttributeType[2];
 		AttributeSetStatus atrSetStatus = new AttributeSetStatus();
 		Map < String, String> metadataProperties = new HashMap();
-		AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
+		//AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
 		String attributeSetString = mapper.writeValueAsString(datastore);
 		
 		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
@@ -149,7 +149,7 @@ public class TokenGenerateController {
 		AttributeType[] result = new AttributeType[2];
 		AttributeSetStatus atrSetStatus = new AttributeSetStatus();
 		Map < String, String> metadataProperties = new HashMap();
-		AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
+		//AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
 		String attributeSetString = mapper.writeValueAsString(datastore);
 		
 		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();

@@ -19,3 +19,7 @@ export KEYSTORE_PATH=resources/testKeys/keystore.jks
 export IDP_METADATA_URL=https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml
 export TESTING=true
 
+
+# Response generation
+export RESPONSE_SENDER_ID=edugainIDPms_001
+export RESPONSE_RECEIVER_ID=CLms001 

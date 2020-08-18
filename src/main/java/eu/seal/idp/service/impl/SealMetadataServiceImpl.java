@@ -25,24 +25,24 @@ public class SealMetadataServiceImpl implements SealMetadataService {
     private final HashMap<String, String> displayNames;
     private final SecurityKeyType[] keyTypes;
     private final EndpointType[] endpoints;
-
+    String[] parts= new String[1];
     @Autowired
     public SealMetadataServiceImpl(KeyStoreService keyServ) throws KeyStoreException, UnsupportedEncodingException {
         this.keyServ = keyServ;
 
         displayNames = new HashMap();
-        displayNames.put("en", System.getenv("SEAL_SERVICE_DESCRIPTION"));
+        displayNames.put("en", "hello");
 
         keyTypes = new SecurityKeyType[2];
 
-        EndpointType endpoint = new EndpointType("POST", "POST", System.getenv("ESMO_EXPOSE_URL"));
+        EndpointType endpoint = new EndpointType("POST", "POST", "bye");
         endpoints = new EndpointType[]{endpoint};
     }
 
     @Override
     public EntityMetadata getMetadata() throws IOException, KeyStoreException {
         InputStream resource = new ClassPathResource(
-                "static/img/uaegeanI4m.png").getInputStream();
+                "static/logo.svg").getInputStream();
         byte[] fileContent = IOUtils.toByteArray(resource);//FileUtils.readFileToByteArray(inputFile);
         String encodedImage = Base64
                 .getEncoder()
@@ -51,10 +51,10 @@ public class SealMetadataServiceImpl implements SealMetadataService {
         String[] claims = {"eduPersonAffiliation","primaryAffiliation","schacHomeOrganization","mail",
                 "schacExpiryDate","mobile","eduPersonPrincipalName","eduPersonPrincipalNamePrior","displayName","sn","givenName"};
         
-        return new EntityMetadata("https://aegean.gr/esmo/gw/ap/metadata", System.getenv("ESMO_DEFAULT_NAME"), this.displayNames, encodedImage,
-                new String[]{"Greece"}, "OAUTH 2.0", new String[]{"ACM"}, System.getenv("SUPPORTED_CLAIMS").split(","),
+        return new EntityMetadata("", "SEAL", this.displayNames, encodedImage,
+                new String[]{""}, "OAUTH 2.0", new String[]{"RM"}, parts,
                 this.endpoints, keyTypes, true, claims,
-                true, System.getenv("ESMO_SUPPORTED_ENC_ALGORITHMS").split(","), null);
+                true, parts, null);
     }
 
 }
