@@ -102,6 +102,20 @@ public class MockClient {
 	}
 	
 	/**
+	 * Gets data from SM/new
+	 */	
+	@RequestMapping(value = "generate/getDataStore", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
+	@ResponseBody
+	public String getSMnew(@RequestParam(value = "session", required = true) String sessionId, @RequestParam(value = "sender", required = true) String sender, @RequestParam(value = "receiver", required = true) String receiver,RedirectAttributes redirectAttrs) throws KeyStoreException, NoSuchAlgorithmException, IOException {
+		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
+		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+		requestParams.add(new NameValuePair("sessionId", sessionId));
+		
+		String rsp = netServ.sendGet(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+		return rsp;
+	}
+	
+	/**
 	 * Store in sm from an existing token
 	 */	
 	@RequestMapping(value = "generate/storeSM", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
