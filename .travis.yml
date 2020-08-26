@@ -23,5 +23,5 @@ jobs:
 	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-        - docker build -t mvjatos/seal-idp-edugain:${CONTAINER_TAG} .
-        - docker push mvjatos/seal-idp-edugain:${CONTAINER_TAG}
+        - docker build -t mvjatos/seal-edugain-idp:${CONTAINER_TAG} .
+        - docker push mvjatos/seal-edugain-idp:${CONTAINER_TAG}
