@@ -11,15 +11,17 @@ jobs:
         - mvn test
 
     - stage: Release
-      if: type != pull_request AND(branch = master OR branch = development)
+      if: type != pull_request AND(branch = master OR branch = development OR branch = "SM-update-fix")
       language: java
       before_script:
       - 'if [ "${TRAVIS_BRANCH}" = "development" ]; then
-        export CONTAINER_TAG=develop;
+            export CONTAINER_TAG="0.0.1";
         elif [ "${TRAVIS_BRANCH}" = "master" ]; then
-        export CONTAINER_TAG=master;
+            export CONTAINER_TAG=latest;
+        elif [ $TRAVIS_BRANCH == "SM-update-fix" ]; then
+            export CONTAINER_TAG=test;
 	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-        - docker build -t cbuendiaatos/idp-edugain:${CONTAINER_TAG} .
-        - docker push cbuendiaatos/idp-edugain:${CONTAINER_TAG}
+        - docker build -t mvjatos/seal-edugain-idp:${CONTAINER_TAG} .
+        - docker push mvjatos/seal-edugain-idp:${CONTAINER_TAG}
