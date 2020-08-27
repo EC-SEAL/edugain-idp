@@ -38,6 +38,8 @@ public class DataStoreServiceImpl {
 	 */
 	
 	public DataStore pushDataSet(DataStore dStore, DataSet dSet) {
+		LOG.info("*** WHAT FOR?");
+		
 		List <DataSet> dsArrayList = new ArrayList();
 		ObjectMapper mapper = new ObjectMapper();
 		

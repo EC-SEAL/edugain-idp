@@ -2,6 +2,7 @@ package eu.seal.idp.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.service.HttpSignatureService;
 import eu.seal.idp.service.NetworkService;
 
@@ -249,6 +250,61 @@ public class NetworkServiceImpl implements NetworkService {
         return null;
 
     }
+    
+	@Override
+	public SessionMngrResponse sendGetSMResponse(String hostUrl, String uri, List<NameValuePair> urlParameters,
+												 int attempt) throws IOException, NoSuchAlgorithmException 
+	{
+		//LOG.info ("sendGetSMResponse");
+		
+		Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM YYYY HH:mm:ss z", Locale.US);
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String nowDate = formatter.format(date);
+        String requestId = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(hostUrl + uri);
+        if (urlParameters != null) {
+            Map<String, String> map = new HashMap();
+            urlParameters.stream().forEach(nameVal -> {
+                map.put(nameVal.getName(), nameVal.getValue());
+                builder.queryParam(nameVal.getName(), nameVal.getValue());
+            });
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders requestHeaders = new HttpHeaders();
+        String host = hostUrl.replace("http://", "").replace("https://", "");
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest("".getBytes());
+        try {
+            requestHeaders.add("host", host);
+            requestHeaders.add("original-date", nowDate);
+            requestHeaders.add("digest", "SHA-256=" + new String(org.tomitribe.auth.signatures.Base64.encodeBase64(digest)));
+            requestHeaders.add("x-request-id", requestId);
+            URL url = new URL(builder.toUriString());
+
+            requestHeaders.add("authorization", sigServ.generateSignature(host, "GET", url.getPath() + "?" + url.getQuery(), null, "application/x-www-form-urlencoded", requestId));
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+            LOG.error("could not generate signature!!");
+            LOG.error(e.getMessage());
+        }
+        
+        //LOG.info ("Signature added.");
+
+        HttpEntity entity = new HttpEntity(requestHeaders);
+        try {
+        	//LOG.info ("Before exchange: " + builder.toUriString()+ " *** " + entity);
+            ResponseEntity<SessionMngrResponse> response = restTemplate.exchange(
+                    builder.toUriString(), HttpMethod.GET, entity, SessionMngrResponse.class);
+            //LOG.info ("After exchange: "  + response);
+            return response.getBody();
+        } catch (RestClientException e) {
+            if (attempt < 2) {
+                return sendGetSMResponse(hostUrl, uri,
+                        				 urlParameters, attempt + 1);
+            }
+        }
+        return null;
+	}
 
     private void addHeaders(HttpHeaders headers, String host, Date date, byte[] digestBytes, String uri, String requestId) throws NoSuchAlgorithmException {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM YYYY HH:mm:ss z", Locale.US);

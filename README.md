@@ -19,12 +19,21 @@ The following environmental variables need to be set prior to running the projec
 | STORE_PASS       |
 | SIGNING_SECRET   |
 | SESSION_MANAGER_URL| 
-| KEY_STORE_PATH   |
-| IDP_METADATA_URL |
+| KEYSTORE_PATH   |
 | JWT_CERT_ALIAS   |
-| KEYSTORE_PASS    |
-| KEYSTORE_ID      |
+| *KEYSTORE_PASS    |
+| *KEYSTORE_ID      |
 | TESTING          |
+| SAML_KEYSTORE_PATH |
+| SAML_KEYSTORE_PASS |
+| SAML_KEYSTORE_ID |
+| SAML_KEY_PASS |
+| HTTPSIG_CERT_ALIAS |
+| RESPONSE_SENDER_ID |
+| CL_RESPONSE_RECEIVER_ID |
+| RM_RESPONSE_RECEIVER_ID |
+| IDP_METADATA_URL=https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml |
+
 
 
 

@@ -22,4 +22,6 @@ export TESTING=true
 
 # Response generation
 export RESPONSE_SENDER_ID=edugainIDPms_001
-export RESPONSE_RECEIVER_ID=CLms001 
+export CL_RESPONSE_RECEIVER_ID=CLms001
+export RM_RESPONSE_RECEIVER_ID=RMms001 
+

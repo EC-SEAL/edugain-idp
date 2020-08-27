@@ -26,5 +26,11 @@ public class DataStoreObject implements Serializable {
     private String id;
     private String type;
     private String data;
+    
+    public DataStoreObject (String id, String type, String data) {
+        this.id = id;
+        this.type = type;
+        this.data = data;
+    }
 
 }

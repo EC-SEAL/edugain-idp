@@ -12,6 +12,7 @@ import eu.seal.idp.model.pojo.AttributeSetStatus;
 import eu.seal.idp.model.pojo.AttributeType;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
+import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.model.pojo.UpdateDataRequest;
 
 import java.io.IOException;
@@ -111,8 +112,10 @@ public class MockClient {
 		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
 		requestParams.add(new NameValuePair("sessionId", sessionId));
 		
-		String rsp = netServ.sendGet(sessionMngrUrl, "/sm/new/get",requestParams, 1);
-		return rsp;
+		//String rsp = netServ.sendGet(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+		SessionMngrResponse rsp = netServ.sendGetSMResponse(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+		
+		return rsp.getAdditionalData();
 	}
 	
 	/**

@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
+import eu.seal.idp.model.pojo.DataStoreObject;
+import eu.seal.idp.model.pojo.DataStoreObjectList;
 import eu.seal.idp.model.pojo.EntityMetadata;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.service.SealMetadataService;
@@ -141,11 +143,19 @@ public class CallbackController {
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
 			// Recover DataStore
-			String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
-
-			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
+			//String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
+			
+			String dataStoreString = sessionManagerClient.getDataStore (sessionId, "dataSet").toString();
+			
+						
 			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
+			DataStoreObject rtrDataStoreObject = new DataStoreObject(UUID.randomUUID().toString(), "dataSet", rtrDataSet.toString());
+			
+//			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
+//			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
+			
+			DataStoreObjectList rtrDatastore = mapper.readValue(dataStoreString, DataStoreObjectList.class);
+			rtrDatastore.add(rtrDataStoreObject);
 			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
 
 			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
@@ -155,7 +165,8 @@ public class CallbackController {
 			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
 
 			
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore);
+			sessionManagerClient.updateDatastore(sessionId, sessionId, stringifiedDatastore);
 			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", stringifiedAuthenticationSet);
 			
 		} catch (NoSuchAlgorithmException e) {

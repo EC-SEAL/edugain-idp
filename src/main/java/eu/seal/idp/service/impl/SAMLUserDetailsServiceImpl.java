@@ -28,6 +28,9 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
 	public Object loadUserBySAML(SAMLCredential credential)
 			throws UsernameNotFoundException {
 		
+		
+		LOG.info ("WHAT FOR???");
+		
 		DataStore datastore = new DataStore();
 		DataSet dataset = new DataSet();
 		String userID = credential.getNameID().getValue();
