@@ -149,7 +149,9 @@ public class CallbackController {
 			
 						
 			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			DataStoreObject rtrDataStoreObject = new DataStoreObject(UUID.randomUUID().toString(), "dataSet", rtrDataSet.toString());
+			DataStoreObject rtrDataStoreObject = new DataStoreObject();
+					//TODO
+					//new DataStoreObject(UUID.randomUUID().toString(), "dataSet", rtrDataSet.toString());
 			
 //			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
 //			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
