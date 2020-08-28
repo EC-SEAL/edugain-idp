@@ -58,6 +58,7 @@ public class SAMLDatasetDetailsServiceImpl {
 			attributeType.setFriendlyName(att.getFriendlyName());
 			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			LOG.info("*****_FriendlyName" + att.getName());
+			LOG.info("*****_Values" + attributeType.getValues().toString());
 			dataSet.addAttributesItem(attributeType);
 		}
 		
@@ -77,6 +78,8 @@ public class SAMLDatasetDetailsServiceImpl {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
+//			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			
 			attributes.add(attributeType);
 		}
 	    AttributeSetStatus atrSetStatus = new AttributeSetStatus();
@@ -95,7 +98,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		
 		
-		LOG.info(attrSet.toString());
+		LOG.info("HEY: " + attrSet.toString());
 		return attrSet;
 	}
 	

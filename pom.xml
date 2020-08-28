@@ -123,12 +123,12 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+<!--         <dependency> -->
+<!--             <groupId>org.projectlombok</groupId> -->
+<!--             <artifactId>lombok</artifactId> -->
 <!--             <version>1.18.12</version> -->
-            <type>jar</type>
-        </dependency>
+<!--             <type>jar</type> -->
+<!--         </dependency> -->
     </dependencies>
     <build>
         <plugins>
