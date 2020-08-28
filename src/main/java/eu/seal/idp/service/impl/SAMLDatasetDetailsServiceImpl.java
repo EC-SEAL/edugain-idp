@@ -78,7 +78,7 @@ public class SAMLDatasetDetailsServiceImpl {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
-//			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			
 			attributes.add(attributeType);
 		}
