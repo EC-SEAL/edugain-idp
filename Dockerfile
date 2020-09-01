@@ -12,4 +12,4 @@ RUN \
 
 ENV JAVA_OPTS=""
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /idp-edugain-0.1.1.DEVELOPMENT.jar" ]
-EXPOSE 8090
+EXPOSE 8081
