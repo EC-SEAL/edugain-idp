@@ -37,7 +37,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		//dataSet.setLoa(user.getLoa()); To be set 
         //dataSet.setIssued(id);
-		String id = UUID.randomUUID().toString();	
+		String id = "DATASET" + UUID.randomUUID().toString();	
 		SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM YYYY HH:mm:ss z", Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = new Date();
@@ -86,7 +86,7 @@ public class SAMLDatasetDetailsServiceImpl {
 	    atrSetStatus.setCode(AttributeSetStatus.CodeEnum.OK);
 	    
 		AttributeSet attrSet = new AttributeSet();
-		attrSet.setId(UUID.randomUUID().toString());
+		attrSet.setId("ANOTHER_DATA_SET" + UUID.randomUUID().toString());
 		attrSet.setType(TypeEnum.RESPONSE);
 		attrSet.setIssuer(System.getenv("RESPONSE_SENDER_ID"));
 		attrSet.setRecipient(System.getenv("CL_RESPONSE_RECEIVER_ID"));

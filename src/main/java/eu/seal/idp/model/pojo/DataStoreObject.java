@@ -46,8 +46,8 @@ public class DataStoreObject implements Serializable {
         return data;
       }
 
-    public void setData(String type) {
-        this.type = type;
+    public void setData(String data) {
+        this.data = data;
       }
 
 }

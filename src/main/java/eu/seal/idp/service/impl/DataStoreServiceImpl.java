@@ -27,7 +27,7 @@ import eu.seal.idp.model.pojo.DataStore;
 public class DataStoreServiceImpl {
 	
 	// Logger
-	private static final Logger LOG = LoggerFactory.getLogger(SAMLDatasetDetailsServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DataStoreServiceImpl.class);
 	
 	
 	/**
@@ -38,7 +38,6 @@ public class DataStoreServiceImpl {
 	 */
 	
 	public DataStore pushDataSet(DataStore dStore, DataSet dSet) {
-		LOG.info("*** WHAT FOR?");
 		
 		List <DataSet> dsArrayList = new ArrayList();
 		ObjectMapper mapper = new ObjectMapper();
@@ -47,7 +46,7 @@ public class DataStoreServiceImpl {
 			dsArrayList = dStore.getClearData();
 		} else {
 			LOG.info("No Dataset was found, creating a new DataStore");
-			String datastoreId = UUID.randomUUID().toString();
+			String datastoreId = "NOT USED" + UUID.randomUUID().toString();
 			dStore.setId(datastoreId);
 		}
 

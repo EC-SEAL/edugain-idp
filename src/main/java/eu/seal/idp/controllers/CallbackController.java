@@ -105,20 +105,24 @@ public class CallbackController {
 
 	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr,
 			Model model) {
+		//TO BE TESTED
+		
 		authentication.getDetails();
 		try {
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			AttributeSet receivedAttributeSet = (new SAMLDatasetDetailsServiceImpl())
 					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
+			//String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
 
 			EntityMetadata metadata = this.metadataServ.getMetadata();
-			String stringifiedMetadata = mapper.writeValueAsString(metadata);
-
-			LOG.info(stringifiedMetadata);
+			//String stringifiedMetadata = mapper.writeValueAsString(metadata);
+			//LOG.info(stringifiedMetadata);
 			
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
+			
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", receivedAttributeSet);
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", metadata);
 			
 
 		} catch (NoSuchAlgorithmException e) {
@@ -135,45 +139,47 @@ public class CallbackController {
 		model.addAttribute("msToken", tokenCreate.getAdditionalData());
 		return new ModelAndView("clientRedirect");
 	}
-
+	
+	
 	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr,
 			Model model) {
 		try {
 			authentication.getDetails();
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
-			// Recover DataStore
-			//String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
 			
-			String dataStoreString = sessionManagerClient.getDataStore (sessionId, "dataSet").toString();
+			// Recover DataStore
+			Object objDataStore = sessionManagerClient.getDataStore (sessionId, "dataSet");  // All the dataStoreObjects with type=dataSet
+			// It couldn't be null. It could be empty.
+			DataStoreObjectList dataStore = (new ObjectMapper()).readValue(objDataStore.toString(),DataStoreObjectList.class);
 			
 						
 			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			//DataStoreObject rtrDataStoreObject = new DataStoreObject();
-					//TODO
-					//new DataStoreObject(UUID.randomUUID().toString(), "dataSet", rtrDataSet.toString());
-			DataStoreObject rtrDataStoreObject = new DataStoreObject ();
-			rtrDataStoreObject.setId(UUID.randomUUID().toString());
+			
+			DataStoreObject rtrDataStoreObject = new DataStoreObject (); 
+			rtrDataStoreObject.setId("DSO"+UUID.randomUUID().toString());
 			rtrDataStoreObject.setType("dataSet");
-			rtrDataStoreObject.setData(rtrDataSet.toString());
 			
-//			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
-//			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
+			ObjectMapper objDataSet = new ObjectMapper();
+			rtrDataStoreObject.setData(objDataSet.writeValueAsString(rtrDataSet));
 			
-			DataStoreObjectList rtrDatastore = mapper.readValue(dataStoreString, DataStoreObjectList.class);
-			rtrDatastore.add(rtrDataStoreObject);
-			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
+			dataStore.add(rtrDataStoreObject);
+			LOG.info ("NEW DatastoreObjectList: " + dataStore.toString());
 
+			
+			
+			
 			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
 					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			LOG.info(authSet.toString());
-
-			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
-
+			LOG.info("AuthenticationSet: " + authSet.toString());
 			
-			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore);
-			sessionManagerClient.updateDatastore(sessionId, sessionId, stringifiedDatastore);
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", stringifiedAuthenticationSet);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore); //OLD
+			ObjectMapper objNewDataStore = new ObjectMapper();
+			//sessionManagerClient.updateDatastore(sessionId, sessionId, dataStore);
+			sessionManagerClient.updateDatastore(sessionId, sessionId, rtrDataSet);
+			
+			
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
 			
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -188,6 +194,63 @@ public class CallbackController {
 		return new ModelAndView("clientRedirect");
 
 	}
+
+//	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr,
+//			Model model) {
+//		try {
+//			authentication.getDetails();
+//			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
+//			SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
+//			
+//			// Recover DataStore
+//			//String dataStoreStringOLD = (String) smResp.getSessionData().getSessionVariables().get("dataStore");	// OLD SM	
+//			String dataStoreListString = sessionManagerClient.getDataStore (sessionId, "dataSet").toString();  // All the dataStoreObjects with type=dataSet
+//			LOG.info ("dataStoreString: " + dataStoreListString);
+//						
+//			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
+//			
+//			DataStoreObject rtrDataStoreObject = new DataStoreObject (); 
+//			rtrDataStoreObject.setId(UUID.randomUUID().toString());
+//			rtrDataStoreObject.setType("dataSet");
+//			rtrDataStoreObject.setData(rtrDataSet.toString());
+//			
+//			/* OLD
+//			DataStore rtrDatastore = mapper.readValue(dataStoreStringOLD, DataStore.class);
+//			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
+//			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
+//			LOG.info ("OLD stringifiedDatastore: " + stringifiedDatastore);
+//			OLD */
+//			
+//			
+//			DataStoreObjectList rtrDatastoreObjectList = mapper.readValue(dataStoreListString, DataStoreObjectList.class);
+//			rtrDatastoreObjectList.add(rtrDataStoreObject);	
+//			String stringifiedDatastoreObjectList = mapper.writeValueAsString(rtrDatastoreObjectList);			
+//			LOG.info ("NEW stringifiedDatastoreObjectList: " + stringifiedDatastoreObjectList);
+//
+//			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
+//					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
+//			LOG.info("AuthenticationSet: " + authSet.toString());
+//
+//			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
+//			LOG.info("stringifiedAuthenticationSet: " + stringifiedAuthenticationSet);
+//			
+//			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore); //OLD
+//			sessionManagerClient.updateDatastore(sessionId, sessionId, stringifiedDatastoreObjectList);
+//			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", stringifiedAuthenticationSet);
+//			
+//		} catch (NoSuchAlgorithmException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		SessionMngrResponse tokenCreate = sessionManagerClient.generateToken(sessionId, responseSenderID,
+//				clResponseReceiverID);
+//
+//		model.addAttribute("callback", callBackAddr);
+//		model.addAttribute("msToken", tokenCreate.getAdditionalData());
+//		return new ModelAndView("clientRedirect");
+//
+//	}
 
 
 }
