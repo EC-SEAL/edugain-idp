@@ -197,16 +197,6 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
         ObjectMapper mapper = new ObjectMapper();
         String stringifiedObject = mapper.writeValueAsString(updateObject);
 
-//        UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, variableName, stringifiedObject);
-//        SessionMngrResponse resp = mapper.readValue(netServ.sendPostBody(sessionMngrURL, URIUPDATESESSION, updateReq, "application/json", 1), SessionMngrResponse.class);
-//        LOG.info("updateSessionData " + resp.getCode().toString());
-//        if (!resp.getCode().toString().equals("OK")) {
-//            LOG.error("ERROR: " + resp.getError());
-//            return "error";
-//        }
-//        LOG.info("session " + sessionId + " updated LEGACY API Session succesfully  with user attributes " + stringifiedObject);
-
-//        if (variableName.equals("dsResponse")) {
             NewUpdateDataRequest newReq = new NewUpdateDataRequest();
             newReq.setId(objectId);
             newReq.setSessionId(sessionId);
@@ -214,16 +204,8 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
             newReq.setData(stringifiedObject);
             String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
             
-            LOG.info("Result" + result);
-            
-//            resp = mapper.readValue(result, SessionMngrResponse.class);
-//            LOG.info("updateSessionData " + resp.getCode().toString());
-//            if (!resp.getCode().toString().equals("OK")) {
-//                LOG.error("ERROR: " + resp.getError());
-//                return "error";
-//            }
+            LOG.info("Result" + result);          
             LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
-//        }
 
         return "ok";
     }

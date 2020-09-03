@@ -61,21 +61,6 @@ public class MockClient {
 		this.netServ = new NetworkServiceImpl(httpSigServ);
 	}
 	
-	/**
-	 * Redirects an existing IDP request to the IDP 
-	 */
-	@RequestMapping(value = "generate/start", method = {RequestMethod.POST, RequestMethod.GET}, produces = "text/plain")
-	@ResponseBody
-	public String startSession() throws KeyStoreException, NoSuchAlgorithmException, IOException {
-		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
-		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-		String rsp = netServ.sendPostForm(sessionMngrUrl, "/sm/startSession", requestParams, 1);
-		return rsp;	
-	}
-	
-	/**
-	 * Redirects an existing IDP request to the IDP 
-	 */	
 	@RequestMapping(value = "generate/generateToken", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
 	@ResponseBody
 	public String generateToken(@RequestParam(value = "session", required = true) String sessionID, @RequestParam(value = "sender", required = true) String sender, @RequestParam(value = "receiver", required = true) String receiver,RedirectAttributes redirectAttrs) throws KeyStoreException, NoSuchAlgorithmException, IOException {
@@ -117,74 +102,8 @@ public class MockClient {
 		
 		return rsp.getAdditionalData();
 	}
+		
 	
-	/**
-	 * Store in sm from an existing token
-	 */	
-	@RequestMapping(value = "generate/storeSM", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
-	@ResponseBody
-	public String storeSM(@RequestParam(value = "session", required = true) String sessionId, @RequestParam(value = "sender", required = true) String sender, @RequestParam(value = "receiver", required = true) String receiver,RedirectAttributes redirectAttrs) throws KeyStoreException, NoSuchAlgorithmException, IOException {
-		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
-		
-		ObjectMapper mapper = new ObjectMapper();
-		
-		DataStore datastore = new DataStore();
-		DataSet dataset = new DataSet();
-		String idpRequestPlain = "{\"id\":\"_394a55a94873c15144a62678dafed1573503f4a6ab\",\"type\":\"Request\",\"issuer\":\"https:\\/\\/clave.sir2.rediris.es\\/module.php\\/saml\\/sp\\/saml2-acs.php\\/q2891006e_ea0002678\",\"recipient\":null,\"inResponseTo\":null,\"loa\":null,\"notBefore\":\"2019-12-17T11:50:54Z\",\"notAfter\":\"2020-12-15T11:55:54Z\",\"status\":{\"code\":null,\"subcode\":null,\"message\":null},\"attributes\":[{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonTargetedID \",\"friendlyName\":\"eduPersonTargetedID \",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#displayName\",\"friendlyName\":\"displayName\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#cn\",\"friendlyName\":\"cn\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#mail\",\"friendlyName\":\"mail\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonAffiliation\",\"friendlyName\":\"eduPersonAffiliation\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonScopedAffiliation\",\"friendlyName\":\"eduPersonScopedAffiliation\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/www.terena.org\\/activities\\/tf-emc2\\/docs\\/schac\\/schac-20110705-1.4.1.schema.txt#schacHomeOrganization\",\"friendlyName\":\"schacHomeOrganization\",\"encoding\":\"UTF-8\",\"language\":null,\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/www.terena.org\\/activities\\/tf-emc2\\/docs\\/schac\\/schac-20110705-1.4.1.schema.txt#schacHomeOrganizationType\",\"friendlyName\":\"schacHomeOrganizationType\",\"encoding\":\"UTF-8\",\"language\":null,\"isMandatory\":false,\"values\":null}],\"properties\":{\"SAML_RelayState\":\"\",\"SAML_RemoteSP_RequestId\":\"_d951f7da6fd1cb7d2de7ab4df483098e\",\"SAML_ForceAuthn\":true,\"SAML_isPassive\":false,\"SAML_NameIDFormat\":\"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\",\"SAML_AllowCreate\":\"true\"}}";
-		AttributeType[] result = new AttributeType[2];
-		AttributeSetStatus atrSetStatus = new AttributeSetStatus();
-		Map < String, String> metadataProperties = new HashMap();
-		//AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
-		String attributeSetString = mapper.writeValueAsString(datastore);
-		
-		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-		requestParams.add(new NameValuePair("sessionId", sessionId));
-		requestParams.add(new NameValuePair("sender", sender));
-		requestParams.add(new NameValuePair("receiver", receiver));
-		
-		
-		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "ClientCallbackAddr", "https://github.com/EC-SEAL");
-		UpdateDataRequest updateReqIdp = new UpdateDataRequest(sessionId, "apRequest", idpRequestPlain);
-
-		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
-		return rsp;
-	}
-	
-	/**
-	 * Store in sm from an existing token
-	 */	
-	@RequestMapping(value = "generate/storeDataset", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
-	@ResponseBody
-	public String storeDS(@RequestParam(value = "session", required = true) String sessionId, @RequestParam(value = "sender", required = true) String sender, @RequestParam(value = "receiver", required = true) String receiver,RedirectAttributes redirectAttrs) throws KeyStoreException, NoSuchAlgorithmException, IOException {
-		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
-		
-		ObjectMapper mapper = new ObjectMapper();
-		
-		DataStore datastore = new DataStore();
-		DataSet dataset = new DataSet();
-		String idpRequestPlain = "{\"id\":\"_394a55a94873c15144a62678dafed1573503f4a6ab\",\"type\":\"Request\",\"issuer\":\"https:\\/\\/clave.sir2.rediris.es\\/module.php\\/saml\\/sp\\/saml2-acs.php\\/q2891006e_ea0002678\",\"recipient\":null,\"inResponseTo\":null,\"loa\":null,\"notBefore\":\"2019-12-17T11:50:54Z\",\"notAfter\":\"2020-12-15T11:55:54Z\",\"status\":{\"code\":null,\"subcode\":null,\"message\":null},\"attributes\":[{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonTargetedID \",\"friendlyName\":\"eduPersonTargetedID \",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#displayName\",\"friendlyName\":\"displayName\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#cn\",\"friendlyName\":\"cn\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#mail\",\"friendlyName\":\"mail\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonAffiliation\",\"friendlyName\":\"eduPersonAffiliation\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/software.internet2.edu\\/eduperson\\/internet2-mace-dir-eduperson-201602.html#eduPersonScopedAffiliation\",\"friendlyName\":\"eduPersonScopedAffiliation\",\"encoding\":\"UTF-8\",\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/www.terena.org\\/activities\\/tf-emc2\\/docs\\/schac\\/schac-20110705-1.4.1.schema.txt#schacHomeOrganization\",\"friendlyName\":\"schacHomeOrganization\",\"encoding\":\"UTF-8\",\"language\":null,\"isMandatory\":false,\"values\":null},{\"name\":\"https:\\/\\/www.terena.org\\/activities\\/tf-emc2\\/docs\\/schac\\/schac-20110705-1.4.1.schema.txt#schacHomeOrganizationType\",\"friendlyName\":\"schacHomeOrganizationType\",\"encoding\":\"UTF-8\",\"language\":null,\"isMandatory\":false,\"values\":null}],\"properties\":{\"SAML_RelayState\":\"\",\"SAML_RemoteSP_RequestId\":\"_d951f7da6fd1cb7d2de7ab4df483098e\",\"SAML_ForceAuthn\":true,\"SAML_isPassive\":false,\"SAML_NameIDFormat\":\"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\",\"SAML_AllowCreate\":\"true\"}}";
-		AttributeType[] result = new AttributeType[2];
-		AttributeSetStatus atrSetStatus = new AttributeSetStatus();
-		Map < String, String> metadataProperties = new HashMap();
-		//AttributeSet attrSet = new AttributeSet("id", TypeEnum.Response, "edugainASms_001", "CLms001", result, metadataProperties, sessionId, "low", null, null, atrSetStatus);
-		String attributeSetString = mapper.writeValueAsString(datastore);
-		
-		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-		requestParams.add(new NameValuePair("sessionId", sessionId));
-		requestParams.add(new NameValuePair("sender", sender));
-		requestParams.add(new NameValuePair("receiver", receiver));
-		
-		
-		
-		UpdateDataRequest updateReq = new UpdateDataRequest(sessionId, "datastore", attributeSetString);
-		UpdateDataRequest updateReqIdp = new UpdateDataRequest(sessionId, "idpRequest", idpRequestPlain);
-		String rsp = netServ.sendPostBody(sessionMngrUrl, "/sm/updateSessionData", updateReq, "application/json", 1);
-		return rsp;
-	}
-	
-	/**
-	 * 
-	 */	
 	@RequestMapping(value = "generate/validateToken", method = {RequestMethod.POST, RequestMethod.GET}, produces = "application/json")
 	@ResponseBody
 	public String validateToken(@RequestParam(value = "msToken", required = true) String msToken, @RequestParam(value = "sender", required = true) String sender, @RequestParam(value = "receiver", required = true) String receiver,RedirectAttributes redirectAttrs) throws KeyStoreException, NoSuchAlgorithmException, IOException {

@@ -1,11 +1,9 @@
 package eu.seal.idp.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml2.core.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,15 +14,14 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-import eu.seal.idp.model.pojo.AttributeSet;
-import eu.seal.idp.model.pojo.AttributeSet.TypeEnum;
-import eu.seal.idp.model.pojo.AttributeSetStatus;
 import eu.seal.idp.model.pojo.AttributeType;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
 
 @Service
 public class DataStoreServiceImpl {
+	
+	// **** UNNECESSARY
 	
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(DataStoreServiceImpl.class);
