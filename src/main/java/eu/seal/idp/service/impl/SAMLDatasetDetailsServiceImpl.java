@@ -38,7 +38,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		List<Attribute> attributesList = credential.getAttributes();
 		for (Attribute att: attributesList) {
-			if ((att.getFriendlyName() != null) && (att.getFriendlyName().contains ("eduPersonTargetedIdentifier"))) {
+			if ((att.getFriendlyName() != null) && (att.getFriendlyName().contains ("eduPersonTargetedID"))) {
 				uniqueId = getAttributeValuesFromCredential(att.getAttributeValues())[0];
 				break;
 			}
@@ -46,7 +46,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		}
 		
 		LOG.info("uniqueId: " + uniqueId);
-		return ((uniqueId.length() == 0)? "eduPersonTargetedIdentifier***NotFound" : DigestUtils.sha1Hex(uniqueId));				
+		return ((uniqueId.length() == 0)? "eduPersonTargetedID***NotFound" : DigestUtils.sha1Hex(uniqueId));				
 	}
 	
 	public DataSet loadDatasetBySAML(String dsId, SAMLCredential credential)
