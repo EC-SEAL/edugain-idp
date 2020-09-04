@@ -148,14 +148,20 @@ public class CallbackController {
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			//SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);  // what for?
 			
-			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
+			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadDatasetBySAML(UUID.randomUUID().toString(), credentials);
 			LOG.info("DataSet: " + rtrDataSet.toString());
 			
-			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
-					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			LOG.info("AuthenticationSet: " + authSet.toString());
 			
-			String objectId ="eduPersonTargetedIdentifier";  // TODO: calculate eduPersonTargetedIdentifier SHA1
+			String inResponseTo = sessionId;
+			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadAttributeSetBySAML(UUID.randomUUID().toString(), inResponseTo, credentials);
+			LOG.info("***TO ASK INRESPONSETO -->AuthenticationSet: " + authSet.toString());
+			// the ID of the request which the set is responding to
+			// From the SPrequest?
+			
+			String objectId =(new SAMLDatasetDetailsServiceImpl())
+					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
 			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);					
 			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
