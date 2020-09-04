@@ -46,7 +46,10 @@ public class SAMLDatasetDetailsServiceImpl {
 		}
 		
 		LOG.info("uniqueId: " + uniqueId);
-		return ((uniqueId.length() == 0)? "eduPersonTargetedID***NotFound" : DigestUtils.sha1Hex(uniqueId));				
+		if ((uniqueId != null) && (uniqueId.length() != 0))
+			return (DigestUtils.sha1Hex(uniqueId));
+		else 
+			return ("eduPersonTargetedID***NotFound"); 				
 	}
 	
 	public DataSet loadDatasetBySAML(String dsId, SAMLCredential credential)
