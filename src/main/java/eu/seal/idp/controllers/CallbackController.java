@@ -7,6 +7,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,16 +94,40 @@ public class CallbackController {
 	@ResponseBody
 	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId,
 			Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
+		// It's authenticate
+		
+		//boolean isAuthenticate = ((req.getPathInfo().contains("authenticate") ) ? true : false);
+		//boolean isAuthenticate = (((session.getAttribute("path")).toString().contains("authenticate"))? true : false);
+		
 		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
 		LOG.info(smResp.toString());
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
 		if (callBackAddr == null) {
 			callBackAddr = "#";
-			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
 		} else if (callBackAddr.contains("rm/response")) {
 			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
 		} else {
-			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
+		}
+	}
+	
+	@RequestMapping("/callbackq")
+	@ResponseBody
+	public ModelAndView isCallbackq(@RequestParam(value = "session", required = true) String sessionId,
+			Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
+		// It's query
+		
+		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
+		LOG.info(smResp.toString());
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
+		if (callBackAddr == null) {
+			callBackAddr = "#";
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
+		} else if (callBackAddr.contains("rm/response")) {
+			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
+		} else {
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
 		}
 	}
 
@@ -142,7 +170,7 @@ public class CallbackController {
 	
 	
 	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr,
-			Model model) {
+			Model model, boolean isAuthenticate) {
 		try {
 			authentication.getDetails();
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
@@ -163,8 +191,11 @@ public class CallbackController {
 			String objectId =(new SAMLDatasetDetailsServiceImpl())
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
-			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);					
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
+			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
+			if (isAuthenticate)  { // It is an "as/authenticate"
+				LOG.info ("/It is an as/authenticate");
+				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
+			}
 			
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
