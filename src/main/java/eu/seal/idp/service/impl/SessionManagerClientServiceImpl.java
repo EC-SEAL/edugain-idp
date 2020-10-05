@@ -167,5 +167,48 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
         return "ok";
     }
 	
+	/**
+	 * Gets the dataStore session variable
+	 * Returns the list of dataSet/linkRequest objects from the DataStore.
+	 * If type is null, returns the complete DataStore.
+	 * @throws IOException 
+	 * @throws NoSuchAlgorithmException 
+	 */	
+	
+	public Object getDataStore(String sessionId, String type) throws NoSuchAlgorithmException, IOException {
+		
+		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
+		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+		requestParams.add(new NameValuePair("sessionId", sessionId));
+		requestParams.add(new NameValuePair("type", type));
+		
+		SessionMngrResponse rsp = netServ.sendGetSMResponse(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+		
+		LOG.info("dataStore: " + rsp.getAdditionalData());
+		return rsp.getAdditionalData();
+	}
+	
+	
+	/**
+	 * Updates the dataStore session Variable
+	 */	
+	
+	public String updateDatastore(String sessionId, String objectId, Object updateObject) throws IOException, NoSuchAlgorithmException {
+        ObjectMapper mapper = new ObjectMapper();
+        String stringifiedObject = mapper.writeValueAsString(updateObject);
+
+            NewUpdateDataRequest newReq = new NewUpdateDataRequest();
+            newReq.setId(objectId);
+            newReq.setSessionId(sessionId);
+            newReq.setType("dataSet");
+            newReq.setData(stringifiedObject);
+            String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
+            
+            LOG.info("Result" + result);          
+            LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
+
+        return "ok";
+    }
+	
 	
 }

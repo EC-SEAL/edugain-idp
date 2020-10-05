@@ -16,12 +16,10 @@ export SAML_KEY_PASS=password
 
 export SESSION_MANAGER_URL=http://vm.project-seal.eu:9090
 export KEYSTORE_PATH=resources/testKeys/keystore.jks
-export IDP_METADATA_URL=https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml
+export IDP_METADATA_URL=http://vm.project-seal.eu:10080/auth/realms/master/protocol/saml/descriptor
 export TESTING=true
-
 
 # Response generation
 export RESPONSE_SENDER_ID=edugainIDPms_001
 export CL_RESPONSE_RECEIVER_ID=CLms001
 export RM_RESPONSE_RECEIVER_ID=RMms001 
-

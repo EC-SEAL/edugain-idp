@@ -28,23 +28,19 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
 	public Object loadUserBySAML(SAMLCredential credential)
 			throws UsernameNotFoundException {
 		
-		DataStore datastore = new DataStore();
-		DataSet dataset = new DataSet();
+		
 		String userID = credential.getNameID().getValue();
-		dataset.setId(userID);
+		
 		List<Attribute> attributesList = credential.getAttributes();
 		
 		for (Attribute att: attributesList) {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
-			dataset.addAttributesItem(attributeType);
+			
 		}
 		
-		LOG.info(dataset.toString());
 		LOG.info(userID + " is logged in");
-		
-		datastore.addClearDataItem(dataset);
 		
 		
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();

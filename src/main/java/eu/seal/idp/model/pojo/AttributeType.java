@@ -74,7 +74,7 @@ public class AttributeType {
 
     @Override
     public String toString() {
-        return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", mandatory=" + mandatory + ", values=" + values + '}';
+        return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", mandatory=" + mandatory + ", values=" + values.toString() + '}';
     }
     
     

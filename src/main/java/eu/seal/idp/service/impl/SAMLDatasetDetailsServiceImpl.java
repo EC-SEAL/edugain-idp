@@ -3,12 +3,11 @@ package eu.seal.idp.service.impl;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSString;
@@ -32,12 +31,34 @@ public class SAMLDatasetDetailsServiceImpl {
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(SAMLDatasetDetailsServiceImpl.class);
 	
+	
+	public String getUniqueIdFromCredentials (SAMLCredential credential) {
+		
+		String uniqueId= "";
+		
+		List<Attribute> attributesList = credential.getAttributes();
+		for (Attribute att: attributesList) {
+			if ((att.getFriendlyName() != null) && (att.getFriendlyName().contains ("eduPersonTargetedID"))) {
+				uniqueId = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+				break;
+			}
+			
+		}
+		
+		LOG.info("uniqueId: " + uniqueId);
+		if ((uniqueId != null) && (uniqueId.length() != 0))
+			return (DigestUtils.sha1Hex(uniqueId));
+		else 
+			return ("eduPersonTargetedID***NotFound"); 				
+	}
+	
 	public DataSet loadDatasetBySAML(String dsId, SAMLCredential credential)
 			throws UsernameNotFoundException {
 		
 		//dataSet.setLoa(user.getLoa()); To be set 
         //dataSet.setIssued(id);
-		String id = UUID.randomUUID().toString();	
+		//String id = "DATASET" + UUID.randomUUID().toString();	
+		String id = dsId;
 		SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM YYYY HH:mm:ss z", Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = new Date();
@@ -53,11 +74,9 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		for (Attribute att: attributesList) {
 			AttributeType attributeType = new AttributeType();
-			LOG.info("*****_Name" + att.getName());
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
 			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
-			LOG.info("*****_FriendlyName" + att.getName());
 			dataSet.addAttributesItem(attributeType);
 		}
 		
@@ -77,13 +96,16 @@ public class SAMLDatasetDetailsServiceImpl {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
+			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			
 			attributes.add(attributeType);
 		}
 	    AttributeSetStatus atrSetStatus = new AttributeSetStatus();
 	    atrSetStatus.setCode(AttributeSetStatus.CodeEnum.OK);
 	    
 		AttributeSet attrSet = new AttributeSet();
-		attrSet.setId(UUID.randomUUID().toString());
+		//attrSet.setId("ANOTHER_DATA_SET" + UUID.randomUUID().toString());
+		attrSet.setId(dsId);
 		attrSet.setType(TypeEnum.RESPONSE);
 		attrSet.setIssuer(System.getenv("RESPONSE_SENDER_ID"));
 		attrSet.setRecipient(System.getenv("CL_RESPONSE_RECEIVER_ID"));
@@ -95,13 +117,13 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		
 		
-		LOG.info(attrSet.toString());
+		LOG.info("HEY: " + attrSet.toString());
 		return attrSet;
 	}
 	
 	
 	public String[] getAttributeValuesFromCredential(List<XMLObject> input) {
-		String[] result;
+		//String[] result;
 		ArrayList<String> ar = new ArrayList<String>();
 		input.forEach((v)->{
 			String value = getAttributeValue(v);

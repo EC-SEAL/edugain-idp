@@ -9,16 +9,16 @@ package eu.seal.idp.model.pojo;
  * and open the template in the editor.
  */
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+//import lombok.AllArgsConstructor;
+//import lombok.Getter;
+//import lombok.NoArgsConstructor;
+//import lombok.Setter;
+//
+//
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Getter
+//@Setter
 public class NewUpdateDataRequest {
 
     private String sessionId;

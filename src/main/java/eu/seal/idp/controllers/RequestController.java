@@ -100,7 +100,12 @@ public class RequestController {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "session is null");
 				return null;
 			}
-			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/callback";
+			request.getSession().setAttribute("path", request.getPathInfo());
+			//LOG.info("path: ", request.getPathInfo());
+			LOG.info("path: ", request.getRequestURI());
+			String redirectUri = "/saml/login?session=" + sealSessionId + 
+					"&callback=/"+ ((request.getRequestURI().contains("authenticate")) ?"callback" : "callbackq");
+			
 			LOG.info("About to redirect to" + redirectUri);
 			return "redirect:" + redirectUri;
 		} else {

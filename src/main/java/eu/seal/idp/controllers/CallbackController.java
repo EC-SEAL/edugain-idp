@@ -7,6 +7,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.DataSet;
 import eu.seal.idp.model.pojo.DataStore;
+import eu.seal.idp.model.pojo.DataStoreObject;
+import eu.seal.idp.model.pojo.DataStoreObjectList;
 import eu.seal.idp.model.pojo.EntityMetadata;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.service.SealMetadataService;
@@ -88,35 +94,63 @@ public class CallbackController {
 	@ResponseBody
 	public ModelAndView isCallback(@RequestParam(value = "session", required = true) String sessionId,
 			Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
+		// It's authenticate
+		
+		//boolean isAuthenticate = ((req.getPathInfo().contains("authenticate") ) ? true : false);
+		//boolean isAuthenticate = (((session.getAttribute("path")).toString().contains("authenticate"))? true : false);
+		
 		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
 		LOG.info(smResp.toString());
 		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
 		if (callBackAddr == null) {
 			callBackAddr = "#";
-			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
 		} else if (callBackAddr.contains("rm/response")) {
 			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
 		} else {
-			return dataStoreHandler(sessionId, authentication, callBackAddr, model);
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
+		}
+	}
+	
+	@RequestMapping("/callbackq")
+	@ResponseBody
+	public ModelAndView isCallbackq(@RequestParam(value = "session", required = true) String sessionId,
+			Authentication authentication, Model model) throws NoSuchAlgorithmException, IOException {
+		// It's query
+		
+		SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
+		LOG.info(smResp.toString());
+		String callBackAddr = (String) smResp.getSessionData().getSessionVariables().get("ClientCallbackAddr");
+		if (callBackAddr == null) {
+			callBackAddr = "#";
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
+		} else if (callBackAddr.contains("rm/response")) {
+			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
+		} else {
+			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
 		}
 	}
 
 	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr,
 			Model model) {
+		//TO BE TESTED
+		
 		authentication.getDetails();
 		try {
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			AttributeSet receivedAttributeSet = (new SAMLDatasetDetailsServiceImpl())
 					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
+			//String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
 
 			EntityMetadata metadata = this.metadataServ.getMetadata();
-			String stringifiedMetadata = mapper.writeValueAsString(metadata);
-
-			LOG.info(stringifiedMetadata);
+			//String stringifiedMetadata = mapper.writeValueAsString(metadata);
+			//LOG.info(stringifiedMetadata);
 			
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
+			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
+			
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", receivedAttributeSet);
+			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", metadata);
 			
 
 		} catch (NoSuchAlgorithmException e) {
@@ -133,30 +167,35 @@ public class CallbackController {
 		model.addAttribute("msToken", tokenCreate.getAdditionalData());
 		return new ModelAndView("clientRedirect");
 	}
-
+	
+	
 	public ModelAndView dataStoreHandler(String sessionId, Authentication authentication, String callBackAddr,
-			Model model) {
+			Model model, boolean isAuthenticate) {
 		try {
 			authentication.getDetails();
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
-			SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);
-			// Recover DataStore
-			String dataStoreString = (String) smResp.getSessionData().getSessionVariables().get("dataStore");
-
-			DataStore rtrDatastore = mapper.readValue(dataStoreString, DataStore.class);
-			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl()).loadDatasetBySAML(sessionId, credentials);
-			rtrDatastore = (new DataStoreServiceImpl()).pushDataSet(rtrDatastore, rtrDataSet);
-			String stringifiedDatastore = mapper.writeValueAsString(rtrDatastore);
-
-			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
-					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			LOG.info(authSet.toString());
-
-			String stringifiedAuthenticationSet = mapper.writeValueAsString(authSet);
-
+			//SessionMngrResponse smResp = sessionManagerClient.getSingleParam("sessionId", sessionId);  // what for?
 			
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dataStore", stringifiedDatastore);
-			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", stringifiedAuthenticationSet);
+			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadDatasetBySAML(UUID.randomUUID().toString(), credentials);
+			LOG.info("DataSet: " + rtrDataSet.toString());
+			
+			
+			String inResponseTo = sessionId;
+			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadAttributeSetBySAML(UUID.randomUUID().toString(), inResponseTo, credentials);
+			LOG.info("***TO ASK INRESPONSETO -->AuthenticationSet: " + authSet.toString());
+			// the ID of the request which the set is responding to
+			// From the SPrequest?
+			
+			String objectId =(new SAMLDatasetDetailsServiceImpl())
+					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
+			
+			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
+			if (isAuthenticate)  { // It is an "as/authenticate"
+				LOG.info ("/It is an as/authenticate");
+				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
+			}
 			
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
