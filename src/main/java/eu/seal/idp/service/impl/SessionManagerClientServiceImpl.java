@@ -144,6 +144,8 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
             LOG.error("ERROR: " + resp.getError());
             return "error";
         }
+        
+        /*
         LOG.info("session " + sessionId + " updated LEGACY API Session succesfully  with user attributes " + stringifiedObject);
 
         if (variableName.equals("dsResponse")) {
@@ -163,6 +165,7 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
             }
             LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
         }
+        */
 
         return "ok";
     }
