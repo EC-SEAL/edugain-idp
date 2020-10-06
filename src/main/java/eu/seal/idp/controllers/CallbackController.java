@@ -182,9 +182,10 @@ public class CallbackController {
 			
 			
 			String inResponseTo = sessionId;
-			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
-					.loadAttributeSetBySAML(UUID.randomUUID().toString(), inResponseTo, credentials);
-			LOG.info("***TO ASK INRESPONSETO -->AuthenticationSet: " + authSet.toString());
+			// NO MORE!
+//			AttributeSet authSet = (new SAMLDatasetDetailsServiceImpl())
+//					.loadAttributeSetBySAML(UUID.randomUUID().toString(), inResponseTo, credentials);
+//			LOG.info("***TO ASK INRESPONSETO -->AuthenticationSet: " + authSet.toString());
 			// the ID of the request which the set is responding to
 			// From the SPrequest?
 			
@@ -194,7 +195,8 @@ public class CallbackController {
 			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
 			if (isAuthenticate)  { // It is an "as/authenticate"
 				LOG.info ("/It is an as/authenticate");
-				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet);
+				//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet); // NO MORE!
+				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticatedSubject", rtrDataSet);
 			}
 			
 		} catch (NoSuchAlgorithmException e) {
