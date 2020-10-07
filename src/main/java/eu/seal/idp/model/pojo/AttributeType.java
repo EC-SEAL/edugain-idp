@@ -74,9 +74,29 @@ public class AttributeType {
 
     @Override
     public String toString() {
-        return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", mandatory=" + mandatory + ", values=" + values.toString() + '}';
+    	  StringBuilder sb = new StringBuilder();
+    	    sb.append("class AttributeType {\n");
+    	    
+    	    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    	    sb.append("    friendlyName: ").append(toIndentedString(friendlyName)).append("\n");
+    	    sb.append("    encoding: ").append(toIndentedString(encoding)).append("\n");
+    	    sb.append("    language: ").append(toIndentedString(language)).append("\n");
+    	    sb.append("    mandatory: ").append(toIndentedString(mandatory)).append("\n");
+    	    sb.append("    values: ").append(toIndentedString(values)).append("\n");
+    	    sb.append("}");
+    	    return sb.toString();
+       // return "AttributeType{" + "name=" + name + ", friendlyName=" + friendlyName + ", encoding=" + encoding + ", language=" + language + ", mandatory=" + mandatory + ", values=" + values.toString() + '}';
     }
     
-    
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+      if (o == null) {
+        return "null";
+      }
+      return o.toString().replace("\n", "\n    ");
+    }
     
 }
