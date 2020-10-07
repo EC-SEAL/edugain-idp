@@ -122,6 +122,8 @@ public class SAMLDatasetDetailsServiceImpl {
         AttributeType issuerAttr = new AttributeType();
 		issuerAttr.setName("issuerEntityId");
 		issuerAttr.setFriendlyName("issuerEntityId");
+		// Temporary
+		issuerAttr.setValues(null);
 		
 		boolean found = false;
 		for (Attribute att: attributesList) {
@@ -135,10 +137,10 @@ public class SAMLDatasetDetailsServiceImpl {
 			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
 			
 			// Looking for the issuer
-			if (!found && att.getName().contentEquals("issuer")) {
-				found = true;
-				issuerAttr.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
-			}
+//			if (!found && att.getName().contentEquals("issuer")) {
+//				found = true;
+//				issuerAttr.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+//			}
 		}
 		
 		dataSet.addAttributesItem(issuerAttr);
