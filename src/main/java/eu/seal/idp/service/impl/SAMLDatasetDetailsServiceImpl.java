@@ -117,6 +117,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		if (subjectId.length() == 0)
 			subjectId = "default-subject";
         dataSet.setSubjectId(subjectId);
+        LOG.info("subjectId: " + subjectId);
 
         AttributeType issuerAttr = new AttributeType();
 		issuerAttr.setName("issuerEntityId");
@@ -130,8 +131,11 @@ public class SAMLDatasetDetailsServiceImpl {
 			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			dataSet.addAttributesItem(attributeType);
 			
+			LOG.info("att.getName():" + att.getName());
+			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
+			
 			// Looking for the issuer
-			if (!found && att.getName().contains("issuer")) {
+			if (!found && att.getName().contentEquals("issuer")) {
 				found = true;
 				issuerAttr.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			}
