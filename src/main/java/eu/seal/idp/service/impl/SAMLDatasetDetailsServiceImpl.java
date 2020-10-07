@@ -68,9 +68,9 @@ public class SAMLDatasetDetailsServiceImpl {
 			}		
 		}
 		
-		if (auxIssuer.length() == 0)
+		if (auxIssuer == null || auxIssuer.length() == 0)
 			auxIssuer = "default-issuer";
-		if (auxSubject.length() == 0)
+		if (auxSubject == null || auxSubject.length() == 0)
 			auxSubject = "default-subject";
 		
 		uniqueId = uniqueId + ":" + auxIssuer + ":" + auxSubject;
