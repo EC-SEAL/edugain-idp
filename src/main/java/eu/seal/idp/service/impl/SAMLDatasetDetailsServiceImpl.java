@@ -125,7 +125,8 @@ public class SAMLDatasetDetailsServiceImpl {
 		List<String> issuerValues = new ArrayList<String>();
 		issuerValues.add (credential.getRemoteEntityID());
 		LOG.info("issuerEntityId: " + credential.getRemoteEntityID());
-		issuerAttr.setValues((String[]) issuerValues.toArray());
+		//issuerAttr.setValues((String[]) issuerValues.toArray());
+		issuerAttr.setValues(issuerValues.toArray(new String[0]));
 		
 		dataSet.addAttributesItem(issuerAttr);
 		
