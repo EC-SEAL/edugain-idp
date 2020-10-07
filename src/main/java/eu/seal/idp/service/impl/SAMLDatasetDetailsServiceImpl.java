@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSString;
@@ -34,22 +33,53 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
-		String uniqueId= "";
+		String uniqueId= "urn:mace:project-seal.eu:id:edugain-idp";
+		String auxIssuer = "";
+		String auxSubject = "";
 		
+		// The issuer of the identity, which can be, in this order: 			 
+		//	schacHomeOrganization
+		//	o   (from eduPerson)
+		//	eduPersonOrgDN 
+		//	"default-issuer"
+
+		// The subject identifier, which can be, in this order :
+		// schacPersonalUniqueID, schacPersonalUniqueCode, eduPersonTargetedID, eduPersonPrincipalName, "default-subject"				
 		List<Attribute> attributesList = credential.getAttributes();
 		for (Attribute att: attributesList) {
-			if ((att.getFriendlyName() != null) && (att.getFriendlyName().contains ("eduPersonTargetedID"))) {
-				uniqueId = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+			if ((att.getFriendlyName() != null) && (
+				(att.getFriendlyName().contains ("schacHomeOrganization")) ||
+				(att.getFriendlyName().contains ("eduPersonOrgDN")) 
+					)) {
+				auxIssuer = getAttributeValuesFromCredential(att.getAttributeValues())[0];
 				break;
-			}
-			
+			}		
 		}
 		
+		for (Attribute att: attributesList) {
+			if ((att.getFriendlyName() != null) && (
+				(att.getFriendlyName().contains ("schacPersonalUniqueID")) ||
+				(att.getFriendlyName().contains ("schacPersonalUniqueCode")) ||
+				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
+				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
+					)) {
+				auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+				break;
+			}		
+		}
+		
+		if (auxIssuer.length() == 0)
+			auxIssuer = "default-issuer";
+		if (auxSubject.length() == 0)
+			auxSubject = "default-subject";
+		
+		uniqueId = uniqueId + ":" + auxIssuer + ":" + auxSubject;
+		
 		LOG.info("uniqueId: " + uniqueId);
-		if ((uniqueId != null) && (uniqueId.length() != 0))
-			return (DigestUtils.sha1Hex(uniqueId));
-		else 
-			return ("eduPersonTargetedID***NotFound"); 				
+		
+		//return (DigestUtils.sha1Hex(uniqueId));  // TODO
+		return (uniqueId);
+				
 	}
 	
 	public DataSet loadDatasetBySAML(String dsId, SAMLCredential credential)
@@ -65,20 +95,49 @@ public class SAMLDatasetDetailsServiceImpl {
         String nowDate = formatter.format(date);
 		DataSet dataSet = new DataSet();
 		dataSet.setId(id);
-        dataSet.setIssuerId("This is the user ID.");
+        dataSet.setIssuerId("issuerEntityId");
         dataSet.setIssued(nowDate);
         dataSet.setType("eduGAIN");
+        
+        String subjectId = "";
+        // In this order:
+        // schacPersonalUniqueID, schacPersonalUniqueCode, eduPersonTargetedID, eduPersonPrincipalName, "default-subject" 
+        List<Attribute> attributesList = credential.getAttributes();
+		for (Attribute att: attributesList) {
+			if ((att.getFriendlyName() != null) && (
+				(att.getFriendlyName().contains ("schacPersonalUniqueID")) ||
+				(att.getFriendlyName().contains ("schacPersonalUniqueCode")) ||
+				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
+				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
+					)) {
+				subjectId = att.getFriendlyName();
+				break;
+			}		
+		}
+		if (subjectId.length() == 0)
+			subjectId = "default-subject";
+        dataSet.setSubjectId(subjectId);
 
+        AttributeType issuerAttr = new AttributeType();
+		issuerAttr.setName("issuerEntityId");
+		issuerAttr.setFriendlyName("issuerEntityId");
 		
-		List<Attribute> attributesList = credential.getAttributes();
-		
+		boolean found = false;
 		for (Attribute att: attributesList) {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
 			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
 			dataSet.addAttributesItem(attributeType);
+			
+			// Looking for the issuer
+			if (!found && att.getName().contains("issuer")) {
+				found = true;
+				issuerAttr.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			}
 		}
+		
+		dataSet.addAttributesItem(issuerAttr);
 		
 		LOG.info(dataSet.toString());
 		return dataSet;
