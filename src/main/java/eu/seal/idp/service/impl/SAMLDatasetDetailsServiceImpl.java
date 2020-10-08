@@ -234,7 +234,9 @@ public class SAMLDatasetDetailsServiceImpl {
 	private String getAnyAttributeValue(XSAnyImpl attributeValue)
 	{
 		LOG.info("AnyAttributeValue: "+attributeValue.getTextContent());
-	    return attributeValue.getTextContent();
+		LOG.info("AnyAttributeValue: "+attributeValue.toString());
+	    //return attributeValue.getTextContent();
+		return attributeValue.toString();
 	}
 	
 }
