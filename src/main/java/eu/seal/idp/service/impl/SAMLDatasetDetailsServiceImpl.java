@@ -60,7 +60,8 @@ public class SAMLDatasetDetailsServiceImpl {
 			}		
 		}
 		
-		for (Attribute att: attributesList) {
+		List<Attribute> attributesList2 = credential.getAttributes();
+		for (Attribute att: attributesList2) {
 			if ((att.getFriendlyName() != null) && (
 				(att.getFriendlyName().contains ("schacPersonalUniqueID")) ||
 				(att.getFriendlyName().contains ("schacPersonalUniqueCode")) ||
@@ -141,7 +142,8 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		dataSet.addAttributesItem(issuerAttr);
 		
-		for (Attribute att: attributesList) {
+		List<Attribute> attributesList2 = credential.getAttributes();
+		for (Attribute att: attributesList2) {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
