@@ -1,5 +1,8 @@
 package eu.seal.idp.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +36,7 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
-		String uniqueId= "urn:mace:project-seal.eu:id:edugain-idp";
+		String uniqueId= "urn:mace:project-seal.eu:id:dataset:edugain-idp";
 		String auxIssuer = null;
 		String auxSubject = null;
 		
@@ -51,6 +54,7 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("schacHomeOrganization")) ||
 				(att.getFriendlyName().contains ("eduPersonOrgDN")) 
 					)) {
+				LOG.info ("friendlyName: " + att.getFriendlyName());
 				auxIssuer = getAttributeValuesFromCredential(att.getAttributeValues())[0];
 				break;
 			}		
@@ -63,6 +67,7 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
+				LOG.info ("friendlyName: " + att.getFriendlyName());
 				auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
 				break;
 			}		
@@ -76,8 +81,14 @@ public class SAMLDatasetDetailsServiceImpl {
 		uniqueId = uniqueId + ":" + auxIssuer + ":" + auxSubject;
 		
 		LOG.info("uniqueId: " + uniqueId);
+		try {
+			uniqueId = URLEncoder.encode(uniqueId, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		//return (DigestUtils.sha1Hex(uniqueId));  // TODO
+		//return (DigestUtils.sha1Hex(uniqueId));  // TODO?
 		return (uniqueId);
 				
 	}
@@ -185,9 +196,13 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	public String[] getAttributeValuesFromCredential(List<XMLObject> input) {
 		//String[] result;
+		
+		LOG.info("XMLObject: " + input.toString());
+		
 		ArrayList<String> ar = new ArrayList<String>();
 		input.forEach((v)->{
 			String value = getAttributeValue(v);
+			LOG.info("getAttributeValue: " + v);
 			ar.add(value);
 		});
 		String[] stringArray = ar.toArray(new String[0]);
@@ -207,11 +222,13 @@ public class SAMLDatasetDetailsServiceImpl {
 
 	private String getStringAttributeValue(XSString attributeValue)
 	{
+		LOG.info("StringAttributeValue: "+attributeValue.getValue());
 	    return attributeValue.getValue();
 	}
 
 	private String getAnyAttributeValue(XSAnyImpl attributeValue)
 	{
+		LOG.info("AnyAttributeValue: "+attributeValue.getTextContent());
 	    return attributeValue.getTextContent();
 	}
 	
