@@ -78,12 +78,13 @@ public class SAMLDatasetDetailsServiceImpl {
 			auxIssuer = "default-issuer";
 		if (auxSubject == null || auxSubject.length() == 0)
 			auxSubject = "default-subject";
-		
-		uniqueId = uniqueId + ":" + auxIssuer + ":" + auxSubject;
-		
-		LOG.info("uniqueId: " + uniqueId);
 		try {
-			uniqueId = URLEncoder.encode(uniqueId, StandardCharsets.UTF_8.toString());
+			uniqueId = uniqueId + ":" + 
+					URLEncoder.encode(auxIssuer, StandardCharsets.UTF_8.toString()) + ":" + 
+					URLEncoder.encode(auxSubject, StandardCharsets.UTF_8.toString());
+			
+			LOG.info("uniqueId: " + uniqueId);
+		
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
