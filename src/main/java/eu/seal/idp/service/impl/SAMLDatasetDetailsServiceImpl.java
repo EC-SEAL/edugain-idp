@@ -34,8 +34,8 @@ public class SAMLDatasetDetailsServiceImpl {
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
 		String uniqueId= "urn:mace:project-seal.eu:id:edugain-idp";
-		String auxIssuer = "";
-		String auxSubject = "";
+		String auxIssuer = null;
+		String auxSubject = null;
 		
 		// The issuer of the identity, which can be, in this order: 			 
 		//	schacHomeOrganization
