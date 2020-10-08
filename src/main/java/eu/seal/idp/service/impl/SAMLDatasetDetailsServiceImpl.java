@@ -60,8 +60,7 @@ public class SAMLDatasetDetailsServiceImpl {
 			}		
 		}
 		
-		List<Attribute> attributesList2 = credential.getAttributes();
-		for (Attribute att: attributesList2) {
+		for (Attribute att: attributesList) {
 			if ((att.getFriendlyName() != null) && (
 				(att.getFriendlyName().contains ("schacPersonalUniqueID")) ||
 				(att.getFriendlyName().contains ("schacPersonalUniqueCode")) ||
@@ -143,8 +142,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		dataSet.addAttributesItem(issuerAttr);
 		
-		List<Attribute> attributesList2 = credential.getAttributes();
-		for (Attribute att: attributesList2) {
+		for (Attribute att: attributesList) {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
@@ -204,8 +202,9 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		ArrayList<String> ar = new ArrayList<String>();
 		input.forEach((v)->{
+			LOG.info("v: " + v);
 			String value = getAttributeValue(v);
-			LOG.info("getAttributeValue: " + v);
+			LOG.info("value: " + value);
 			ar.add(value);
 		});
 		String[] stringArray = ar.toArray(new String[0]);
@@ -214,6 +213,7 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	private String getAttributeValue(XMLObject attributeValue)
 	{
+		
 	    return attributeValue == null ?
 	            null :
 	            attributeValue instanceof XSString ?
@@ -221,6 +221,8 @@ public class SAMLDatasetDetailsServiceImpl {
 	                    attributeValue instanceof XSAnyImpl ?
 	                            getAnyAttributeValue((XSAnyImpl) attributeValue) :
 	                            attributeValue.toString();
+	                            
+	                            
 	}
 
 	private String getStringAttributeValue(XSString attributeValue)
