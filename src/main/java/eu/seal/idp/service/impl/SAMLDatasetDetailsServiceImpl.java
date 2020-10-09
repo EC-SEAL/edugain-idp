@@ -22,12 +22,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Service;
 
-
 import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.AttributeSet.TypeEnum;
 import eu.seal.idp.model.pojo.AttributeSetStatus;
 import eu.seal.idp.model.pojo.AttributeType;
 import eu.seal.idp.model.pojo.DataSet;
+import eu.seal.idp.service.ParameterService;
 
 @Service
 public class SAMLDatasetDetailsServiceImpl {
@@ -35,13 +35,14 @@ public class SAMLDatasetDetailsServiceImpl {
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(SAMLDatasetDetailsServiceImpl.class);
 	
-	@Value("${edugain.idp.name}")
 	private String moduleId;
+	private ParameterService paramServ;
 	
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
 		String uniqueId= "urn:mace:project-seal.eu:id:dataset:";
 		try {
+			moduleId = this.paramServ.getParam("RESPONSE_SENDER_ID") == null ? "edugainIDPms_001": this.paramServ.getParam("RESPONSE_SENDER_ID");
 			uniqueId = uniqueId + //"edugain-idp";
 					URLEncoder.encode(moduleId, StandardCharsets.UTF_8.toString());
 		} catch (UnsupportedEncodingException e1) {
@@ -301,5 +302,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		return attributeValue.getTextContent();
 		
 	}
+	
+	
 	
 }
