@@ -36,11 +36,11 @@ public class SAMLDatasetDetailsServiceImpl {
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(SAMLDatasetDetailsServiceImpl.class);
 	
-	private String moduleId;
+	private String moduleId;	
 	
-	@Autowired
 	private ParameterService paramServ;
 	
+	@Autowired
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
 		String uniqueId= "urn:mace:project-seal.eu:id:dataset:";
