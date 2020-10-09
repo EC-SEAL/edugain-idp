@@ -80,7 +80,8 @@ public class SAMLDatasetDetailsServiceImpl {
 		}
 		
 		if (auxIssuer == null || auxIssuer.length() == 0)
-			auxIssuer = "default-issuer";
+			//auxIssuer = "default-issuer";
+			auxIssuer = credential.getRemoteEntityID();
 		if (auxSubject == null || auxSubject.length() == 0)
 			auxSubject = "default-subject";
 		try {
@@ -117,6 +118,9 @@ public class SAMLDatasetDetailsServiceImpl {
         dataSet.setIssued(nowDate);
         dataSet.setType("eduGAIN");
         
+        
+        // TODO: subjectId and auxIssuer could be read from the dsId!!!
+        //
         String subjectId = "";
         // In this order:
         // schacPersonalUniqueID, schacPersonalUniqueCode, eduPersonTargetedID, eduPersonPrincipalName, "default-subject" 
@@ -140,49 +144,62 @@ public class SAMLDatasetDetailsServiceImpl {
 			subjectId = "default-subject";
         dataSet.setSubjectId(subjectId);
         LOG.info("subjectId: " + subjectId);
-
+        
+        String auxIssuer = "";
+        for (Attribute att: attributesList) {
+			if ((att.getFriendlyName() != null) && (
+				(att.getFriendlyName().contains ("schacHomeOrganization")) ||
+				(att.getFriendlyName().contains ("eduPersonOrgDN")) 
+					)) {
+				LOG.info ("friendlyName: " + att.getFriendlyName());
+				auxIssuer = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+				break;
+			}		
+		}
+        if (auxIssuer == null || auxIssuer.length() == 0)
+			auxIssuer = credential.getRemoteEntityID();
+        
         AttributeType issuerAttr = new AttributeType();
 		issuerAttr.setName("issuerEntityId");
 		issuerAttr.setFriendlyName("issuerEntityId");
 		List<String> issuerValues = new ArrayList<String>();
-		issuerValues.add (credential.getRemoteEntityID());
-		LOG.info("issuerEntityId: " + credential.getRemoteEntityID());
-		//issuerAttr.setValues((String[]) issuerValues.toArray());
+		issuerValues.add (auxIssuer);
+		LOG.info("issuerEntityId: " + auxIssuer);
 		issuerAttr.setValues(issuerValues.toArray(new String[0]));
 		
 		dataSet.addAttributesItem(issuerAttr);
 		
-//		for (Attribute att: attributesList) {
-//			AttributeType attributeType = new AttributeType();
-//			attributeType.setName(att.getName());
-//			attributeType.setFriendlyName(att.getFriendlyName());
-//			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
-//			dataSet.addAttributesItem(attributeType);
-//			
-//			LOG.info("att.getName():" + att.getName());
-//			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
-//		}
+		for (Attribute att: attributesList) {
+			AttributeType attributeType = new AttributeType();
+			attributeType.setName(att.getName());
+			attributeType.setFriendlyName(att.getFriendlyName());
+			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			dataSet.addAttributesItem(attributeType);
+			
+			LOG.info("att.getName():" + att.getName());
+			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
+		}
 		
-		for (AttributeStatement attributeStatement : credential.getAuthenticationAssertion().getAttributeStatements())
-	    {
-	        for (Attribute att : attributeStatement.getAttributes())
-	        {
-	        	AttributeType attributeType = new AttributeType();
-				attributeType.setName(att.getName());
-				attributeType.setFriendlyName(att.getFriendlyName());
-				//attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
-				
-				List<XMLObject> attributeValues = att.getAttributeValues();
-	            if (!attributeValues.isEmpty())
-	            {
-	                LOG.info("value: " + getAttributeValue(attributeValues.get(0)));
-	                List <String> auxL = new ArrayList<String>();
-	                auxL.add(getAttributeValue(attributeValues.get(0)));
-	                attributeType.setValues(auxL.toArray(new String[0]));
-	            }
-				dataSet.addAttributesItem(attributeType);
-	        }
-	    }
+//		for (AttributeStatement attributeStatement : credential.getAuthenticationAssertion().getAttributeStatements())
+//	    {
+//	        for (Attribute att : attributeStatement.getAttributes())
+//	        {
+//	        	AttributeType attributeType = new AttributeType();
+//				attributeType.setName(att.getName());
+//				attributeType.setFriendlyName(att.getFriendlyName());
+//				//attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+//				
+//				List<XMLObject> attributeValues = att.getAttributeValues();
+//	            if (!attributeValues.isEmpty())
+//	            {
+//	                LOG.info("value: " + getAttributeValue(attributeValues.get(0)));
+//	                List <String> auxL = new ArrayList<String>();
+//	                auxL.add(getAttributeValue(attributeValues.get(0)));
+//	                attributeType.setValues(auxL.toArray(new String[0]));
+//	            }
+//				dataSet.addAttributesItem(attributeType);
+//	        }
+//	    }
 			
 		LOG.info(dataSet.toString());
 		return dataSet;
@@ -228,8 +245,6 @@ public class SAMLDatasetDetailsServiceImpl {
 		attrSet.setStatus(atrSetStatus);
 		attrSet.setAttributes(attributes);
 		
-		
-		
 		LOG.info("HEY: " + attrSet.toString());
 		return attrSet;
 	}
@@ -253,14 +268,6 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	private String getAttributeValue(XMLObject attributeValue)
 	{
-//		return attributeValue == null ?
-//	            null :
-//	            attributeValue instanceof XSString ?
-//	                ((XSString) attributeValue).getValue() :
-//	                attributeValue instanceof XSAnyImpl ?
-//	                    ((XSAnyImpl) attributeValue).getTextContent() :
-//	                    attributeValue.toString();
-		
 	    return attributeValue == null ?
 	            null :
 	            attributeValue instanceof XSString ?
