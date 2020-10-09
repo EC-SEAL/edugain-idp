@@ -1,13 +1,19 @@
 package eu.seal.idp.service.impl;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import org.opensaml.saml2.core.Attribute;
@@ -22,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.AttributeSet.TypeEnum;
@@ -38,14 +45,11 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	private String moduleId;	
 	
-	private ParameterService paramServ;
-	
-	@Autowired
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
 		String uniqueId= "urn:mace:project-seal.eu:id:dataset:";
 		try {
-			moduleId = this.paramServ.getParam("RESPONSE_SENDER_ID") == null ? "edugainIDPms_001": this.paramServ.getParam("RESPONSE_SENDER_ID");
+			moduleId = System.getenv("RESPONSE_SENDER_ID") == null ? "edugainIDPms_001": System.getenv("RESPONSE_SENDER_ID");
 			uniqueId = uniqueId + //"edugain-idp";
 					URLEncoder.encode(moduleId, StandardCharsets.UTF_8.toString());
 		} catch (UnsupportedEncodingException e1) {
@@ -306,6 +310,5 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 	}
 	
-	
-	
+    
 }
