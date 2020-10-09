@@ -185,7 +185,16 @@ public class SAMLDatasetDetailsServiceImpl {
 			AttributeType attributeType = new AttributeType();
 			attributeType.setName(att.getName());
 			attributeType.setFriendlyName(att.getFriendlyName());
-			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			//attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+			
+			List<XMLObject> attributeValues = att.getAttributeValues();
+            if (!attributeValues.isEmpty())
+            {
+                LOG.info("value: " + getAttributeValue(attributeValues.get(0)));
+                List <String> auxL = new ArrayList<String>();
+                auxL.add(getAttributeValue(attributeValues.get(0)));
+                attributeType.setValues(auxL.toArray(new String[0]));
+            }
 			
 			attributes.add(attributeType);
 		}
