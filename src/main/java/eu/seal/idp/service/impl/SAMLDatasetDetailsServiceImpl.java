@@ -123,8 +123,10 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
-				subjectId = att.getFriendlyName();
-				break;
+				if (getAttributeValuesFromCredential(att.getAttributeValues()) != null) {
+					subjectId = att.getFriendlyName();
+					break;
+				}
 			}		
 		}
 		if (subjectId.length() == 0)
@@ -254,9 +256,8 @@ public class SAMLDatasetDetailsServiceImpl {
 	private String getAnyAttributeValue(XSAnyImpl attributeValue)
 	{
 		LOG.info("AnyAttributeValue: "+attributeValue.getTextContent());
-		//LOG.info("AnyAttributeValue: "+attributeValue.toString());
-	    return attributeValue.getTextContent();
-		//return attributeValue.toString();
+		return attributeValue.getTextContent();
+		
 	}
 	
 }
