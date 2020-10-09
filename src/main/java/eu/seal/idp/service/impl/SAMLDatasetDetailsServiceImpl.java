@@ -124,7 +124,8 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
 				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
-					(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0)) {
+					(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0) &&
+					(getAttributeValuesFromCredential(att.getAttributeValues())[0] != null)) {
 					subjectId = att.getFriendlyName();
 					break;
 				}
@@ -164,7 +165,16 @@ public class SAMLDatasetDetailsServiceImpl {
 	        	AttributeType attributeType = new AttributeType();
 				attributeType.setName(att.getName());
 				attributeType.setFriendlyName(att.getFriendlyName());
-				attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+				//attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+				
+				List<XMLObject> attributeValues = att.getAttributeValues();
+	            if (!attributeValues.isEmpty())
+	            {
+	                LOG.info("value: " + getAttributeValue(attributeValues.get(0)));
+	                List <String> auxL = new ArrayList<String>();
+	                auxL.add(getAttributeValue(attributeValues.get(0)));
+	                attributeType.setValues(auxL.toArray(new String[0]));
+	            }
 				dataSet.addAttributesItem(attributeType);
 	        }
 	    }
@@ -178,7 +188,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 
 		List <AttributeType> attributes = new ArrayList();
-		AttributeType[] attributeTypeArray = new AttributeType[attributes.size()];
+		//AttributeType[] attributeTypeArray = new AttributeType[attributes.size()];
 		List<Attribute> attributesList = credential.getAttributes();
 		
 		for (Attribute att: attributesList) {
