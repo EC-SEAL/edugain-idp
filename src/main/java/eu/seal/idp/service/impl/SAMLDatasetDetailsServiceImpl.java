@@ -17,6 +17,7 @@ import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSAnyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,19 @@ public class SAMLDatasetDetailsServiceImpl {
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(SAMLDatasetDetailsServiceImpl.class);
 	
+	@Value("${edugain.idp.name}")
+	private String moduleId;
 	
 	public String getUniqueIdFromCredentials (SAMLCredential credential) {
 		
-		String uniqueId= "urn:mace:project-seal.eu:id:dataset:edugain-idp";
+		String uniqueId= "urn:mace:project-seal.eu:id:dataset:";
+		try {
+			uniqueId = uniqueId + //"edugain-idp";
+					URLEncoder.encode(moduleId, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String auxIssuer = null;
 		String auxSubject = null;
 		
