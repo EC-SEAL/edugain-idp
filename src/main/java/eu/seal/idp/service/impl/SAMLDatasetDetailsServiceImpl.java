@@ -68,9 +68,14 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
-				LOG.info ("friendlyName: " + att.getFriendlyName());
-				auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
-				break;
+				
+				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
+						(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0) &&
+						(getAttributeValuesFromCredential(att.getAttributeValues())[0] != null)) {
+					LOG.info ("friendlyName: " + att.getFriendlyName());
+					auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+					break;
+				}
 			}		
 		}
 		
