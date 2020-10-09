@@ -19,7 +19,7 @@ jobs:
         elif [ "${TRAVIS_BRANCH}" = "master" ]; then
             export CONTAINER_TAG=latest;
         elif [ $TRAVIS_BRANCH == "SM-update-fix" ]; then
-            export CONTAINER_TAG=test2;
+            export CONTAINER_TAG=test3;
 	fi'
       script:
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"

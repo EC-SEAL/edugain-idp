@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSAnyImpl;
@@ -142,16 +143,28 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		dataSet.addAttributesItem(issuerAttr);
 		
-		for (Attribute att: attributesList) {
-			AttributeType attributeType = new AttributeType();
-			attributeType.setName(att.getName());
-			attributeType.setFriendlyName(att.getFriendlyName());
-			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
-			dataSet.addAttributesItem(attributeType);
-			
-			LOG.info("att.getName():" + att.getName());
-			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
-		}
+//		for (Attribute att: attributesList) {
+//			AttributeType attributeType = new AttributeType();
+//			attributeType.setName(att.getName());
+//			attributeType.setFriendlyName(att.getFriendlyName());
+//			attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+//			dataSet.addAttributesItem(attributeType);
+//			
+//			LOG.info("att.getName():" + att.getName());
+//			LOG.info("att.getFriendlyName():" + att.getFriendlyName());
+//		}
+		
+		for (AttributeStatement attributeStatement : credential.getAuthenticationAssertion().getAttributeStatements())
+	    {
+	        for (Attribute att : attributeStatement.getAttributes())
+	        {
+	        	AttributeType attributeType = new AttributeType();
+				attributeType.setName(att.getName());
+				attributeType.setFriendlyName(att.getFriendlyName());
+				attributeType.setValues(getAttributeValuesFromCredential(att.getAttributeValues()));
+				dataSet.addAttributesItem(attributeType);
+	        }
+	    }
 			
 		LOG.info(dataSet.toString());
 		return dataSet;
@@ -213,6 +226,13 @@ public class SAMLDatasetDetailsServiceImpl {
 	
 	private String getAttributeValue(XMLObject attributeValue)
 	{
+//		return attributeValue == null ?
+//	            null :
+//	            attributeValue instanceof XSString ?
+//	                ((XSString) attributeValue).getValue() :
+//	                attributeValue instanceof XSAnyImpl ?
+//	                    ((XSAnyImpl) attributeValue).getTextContent() :
+//	                    attributeValue.toString();
 		
 	    return attributeValue == null ?
 	            null :
@@ -234,9 +254,9 @@ public class SAMLDatasetDetailsServiceImpl {
 	private String getAnyAttributeValue(XSAnyImpl attributeValue)
 	{
 		LOG.info("AnyAttributeValue: "+attributeValue.getTextContent());
-		LOG.info("AnyAttributeValue: "+attributeValue.toString());
-	    //return attributeValue.getTextContent();
-		return attributeValue.toString();
+		//LOG.info("AnyAttributeValue: "+attributeValue.toString());
+	    return attributeValue.getTextContent();
+		//return attributeValue.toString();
 	}
 	
 }
