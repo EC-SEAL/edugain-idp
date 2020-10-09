@@ -123,7 +123,8 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonTargetedID")) ||
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
-				if (getAttributeValuesFromCredential(att.getAttributeValues()) != null) {
+				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
+					(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0)) {
 					subjectId = att.getFriendlyName();
 					break;
 				}
