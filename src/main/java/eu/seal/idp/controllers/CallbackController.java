@@ -106,7 +106,7 @@ public class CallbackController {
 			callBackAddr = "#";
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
 		} else if (callBackAddr.contains("rm/response")) {
-			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
+			return dsResponseHandler(sessionId, authentication, callBackAddr, model, true);
 		} else {
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model, true);
 		}
@@ -125,14 +125,14 @@ public class CallbackController {
 			callBackAddr = "#";
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
 		} else if (callBackAddr.contains("rm/response")) {
-			return dsResponseHandler(sessionId, authentication, callBackAddr, model);
+			return dsResponseHandler(sessionId, authentication, callBackAddr, model, false);
 		} else {
 			return dataStoreHandler(sessionId, authentication, callBackAddr, model, false);
 		}
 	}
 
 	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr,
-			Model model) {
+			Model model, boolean isAuthenticate) {
 		
 		authentication.getDetails();
 		try {
@@ -151,6 +151,11 @@ public class CallbackController {
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
 			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
+			
+			if (isAuthenticate)  { // It is an "as/authenticate"
+				LOG.info ("It is an as/authenticate");
+				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticatedSubject", rtrDataSet);
+			}
 			
 
 		} catch (NoSuchAlgorithmException e) {
@@ -194,7 +199,7 @@ public class CallbackController {
 			
 			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
 			if (isAuthenticate)  { // It is an "as/authenticate"
-				LOG.info ("/It is an as/authenticate");
+				LOG.info ("It is an as/authenticate");
 				//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet); // NO MORE!
 				sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticatedSubject", rtrDataSet);
 			}
