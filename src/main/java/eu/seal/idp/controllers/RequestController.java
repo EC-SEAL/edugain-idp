@@ -101,10 +101,13 @@ public class RequestController {
 				return null;
 			}
 			request.getSession().setAttribute("path", request.getPathInfo());
-			//LOG.info("path: ", request.getPathInfo());
-			LOG.info("path: ", request.getRequestURI());
+			LOG.info("pathInfo: ", request.getPathInfo());
+			LOG.info("pathURI: ", request.getRequestURI());
+			LOG.info("pathURL: ", request.getRequestURL());
+			LOG.info("pathServlet: ", request.getServletPath());
+			
 			String redirectUri = "/saml/login?session=" + sealSessionId + 
-					"&callback=/"+ ((request.getRequestURI().contains("authenticate")) ?"callback" : "callbackq");
+					"&callback=/"+ ((request.getServletPath().contains("authenticate")) ?"callback" : "callbackq");
 			
 			LOG.info("About to redirect to" + redirectUri);
 			return "redirect:" + redirectUri;
