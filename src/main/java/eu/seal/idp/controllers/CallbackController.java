@@ -133,24 +133,24 @@ public class CallbackController {
 
 	public ModelAndView dsResponseHandler(String sessionId, Authentication authentication, String callBackAddr,
 			Model model) {
-		//TO BE TESTED
 		
 		authentication.getDetails();
 		try {
 			SAMLCredential credentials = (SAMLCredential) authentication.getCredentials();
 			AttributeSet receivedAttributeSet = (new SAMLDatasetDetailsServiceImpl())
 					.loadAttributeSetBySAML(UUID.randomUUID().toString(), sessionId, credentials);
-			//String stringifiedAsResponse = mapper.writeValueAsString(receivedAttributeSet);
 
 			EntityMetadata metadata = this.metadataServ.getMetadata();
-			//String stringifiedMetadata = mapper.writeValueAsString(metadata);
-			//LOG.info(stringifiedMetadata);
-			
-			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", stringifiedAsResponse);
-			//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", stringifiedMetadata);
 			
 			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsResponse", receivedAttributeSet);
 			sessionManagerClient.updateSessionVariables(sessionId, sessionId,"dsMetadata", metadata);
+			
+			DataSet rtrDataSet = (new SAMLDatasetDetailsServiceImpl())
+					.loadDatasetBySAML(UUID.randomUUID().toString(), credentials);
+			String objectId =(new SAMLDatasetDetailsServiceImpl())
+					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
+			
+			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
 			
 
 		} catch (NoSuchAlgorithmException e) {
