@@ -79,6 +79,75 @@ public class RequestController {
 	 * @throws JsonParseException 
 	 */
 
+	@RequestMapping(value = {"/is/query"}, method = { RequestMethod.POST, RequestMethod.GET})
+	public String query(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request, HttpServletResponse response) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
+		
+		EntityMetadata metadata = this.metadataServ.getMetadata();
+		String stringifiedMetadata = mapper.writeValueAsString(metadata);
+		
+		LOG.info(stringifiedMetadata);	
+		
+		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+		requestParams.add(new NameValuePair("token", msToken));
+	
+		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
+		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
+		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
+			String sealSessionId = resp.getSessionData().getSessionId();
+			if(sealSessionId == null || sealSessionId.isEmpty()) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "session is null");
+				return null;
+			}
+			
+			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/"+ "callbackq";
+			
+			LOG.info("About to redirect to" + redirectUri);
+			return "redirect:" + redirectUri;
+		} else {
+			LOG.error("Error validating token");
+			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error validating token! " + resp.getError());
+			return null;
+		}
+	}
+	
+	@RequestMapping(value = {"/as/authenticate"}, method = { RequestMethod.POST, RequestMethod.GET})
+	public String authenticate(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request, HttpServletResponse response) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
+		
+		EntityMetadata metadata = this.metadataServ.getMetadata();
+		String stringifiedMetadata = mapper.writeValueAsString(metadata);
+		
+		LOG.info(stringifiedMetadata);	
+		
+		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+		requestParams.add(new NameValuePair("token", msToken));
+	
+		String rspValidate = netServ.sendGet(sessionMngrUrl, "/sm/validateToken", requestParams, 1);
+		SessionMngrResponse resp = mapper.readValue(rspValidate, SessionMngrResponse.class);
+		if (resp.getCode().toString().equals("OK") && StringUtils.isEmpty(resp.getError())) {
+			String sealSessionId = resp.getSessionData().getSessionId();
+			if(sealSessionId == null || sealSessionId.isEmpty()) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "session is null");
+				return null;
+			}
+			
+			String redirectUri = "/saml/login?session=" + sealSessionId + "&callback=/"+ "callback";
+			
+			LOG.info("About to redirect to" + redirectUri);
+			return "redirect:" + redirectUri;
+		} else {
+			LOG.error("Error validating token");
+			redirectAttrs.addFlashAttribute("errorMsg", "Error validating token! " + resp.getError());
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error validating token! " + resp.getError());
+			return null;
+		}
+	}
+	
+	/*OLD
 	@RequestMapping(value = {"/is/query", "as/authenticate"}, method = { RequestMethod.POST, RequestMethod.GET})
 	public String query(@RequestParam(value = "msToken", required = true) String msToken, RedirectAttributes redirectAttrs, HttpServletRequest request, HttpServletResponse response) throws KeyStoreException, JsonParseException, JsonMappingException, NoSuchAlgorithmException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
@@ -100,14 +169,16 @@ public class RequestController {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "session is null");
 				return null;
 			}
-			request.getSession().setAttribute("path", request.getPathInfo());
+			
 			LOG.info("pathInfo: ", request.getPathInfo());
 			LOG.info("pathURI: ", request.getRequestURI());
 			LOG.info("pathURL: ", request.getRequestURL());
 			LOG.info("pathServlet: ", request.getServletPath());
 			
+			request.getSession().setAttribute("path", request.getPathInfo());
+			
 			String redirectUri = "/saml/login?session=" + sealSessionId + 
-					"&callback=/"+ ((request.getServletPath().contains("authenticate")) ?"callback" : "callbackq");
+					"&callback=/"+ ((request.getRequestURI().contains("authenticate")) ?"callback" : "callbackq");
 			
 			LOG.info("About to redirect to" + redirectUri);
 			return "redirect:" + redirectUri;
@@ -118,5 +189,6 @@ public class RequestController {
 			return null;
 		}
 	}
+	*/
 }
 
