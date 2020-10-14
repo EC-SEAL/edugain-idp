@@ -28,7 +28,8 @@ public class SealMetadataServiceImpl implements SealMetadataService {
     private final HashMap<String, String> displayNames;
     private final SecurityKeyType[] keyTypes;
     private final EndpointType[] endpoints;
-    String[] parts= new String[1];
+    //String[] parts= new String[1];
+    
     @Autowired
     public SealMetadataServiceImpl(KeyStoreService keyServ) throws KeyStoreException, UnsupportedEncodingException {
         this.keyServ = keyServ;
@@ -37,6 +38,7 @@ public class SealMetadataServiceImpl implements SealMetadataService {
         displayNames.put("en", "hello");
 
         keyTypes = new SecurityKeyType[2];
+        
 
         EndpointType endpoint = new EndpointType("POST", "POST", "bye");
         endpoints = new EndpointType[]{endpoint};
@@ -76,10 +78,14 @@ public class SealMetadataServiceImpl implements SealMetadataService {
                 "sn", "schGrAcPersonalLinkageID", "givenName;lang-el",
                 "displayName", "mobile", "givenName", "cn"
         };
-        return new EntityMetadata("", "SEAL", this.displayNames, encodedImage,
-                new String[]{""}, "OAUTH 2.0", new String[]{"RM"}, parts,
+        String[] supportedSigningAlgs= new String[1];
+        
+        return new EntityMetadata("SEAL", "SEAL", this.displayNames, encodedImage,
+                new String[]{""}, "OAUTH 2.0", new String[]{"RM"}, claims, //parts,
                 this.endpoints, keyTypes, true, claims,
-                true, parts, null);
+                true, supportedSigningAlgs, //parts, 
+                null);
+        
     }
 
 }
