@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyStoreException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -48,9 +51,31 @@ public class SealMetadataServiceImpl implements SealMetadataService {
                 .getEncoder()
                 .encodeToString(fileContent);
         
-        String[] claims = {"eduPersonAffiliation","primaryAffiliation","schacHomeOrganization","mail",
-                "schacExpiryDate","mobile","eduPersonPrincipalName","eduPersonPrincipalNamePrior","displayName","sn","givenName"};
-        
+        //String[] claims = {"eduPersonAffiliation","primaryAffiliation","schacHomeOrganization","mail",
+        //        "schacExpiryDate","mobile","eduPersonPrincipalName","eduPersonPrincipalNamePrior","displayName","sn","givenName"};
+        String[] claims = {
+                "schacHomeOrganization", "eduPersonTargetedID", "schGrAcPersonID",
+                "uid", "schacGender", "schacYearOfBirth", "schacDateOfBirth",
+                "schacCountryOfCitizenship", "schGrAcPersonSSN", "schacPersonalUniqueID",
+                "eduPersonOrgDN", "mail", "eduPersonAffiliation", "eduPersonAffiliation",
+                "eduPersonScopedAffiliation", "eduPersonPrimaryAffiliation", "givenName", "givenName_en",
+                "givenName_el", "sn", "sn_el", "sn_en", "cn_en", "cn_el", "displayName", "schacPersonalPosition",
+                "schacPersonalUniqueCode", "schGrAcEnrollment", "schGrAcInscription", "schGrAcPersonalLinkageID",
+                "eduPersonEntitlement",
+                "schGrAcPersonID", "ou", "dc", "schGrAcEnrollment",
+                "eduPersonPrimaryAffiliation", "sn;lang-el",
+                "mailLocalAddress", "sn;lang-en",
+                "cn;lang-el", "eduPersonOrgDN", "schGrAcPersonID",
+                "schacPersonalUniqueCode", "schacYearOfBirth",
+                "schacPersonalPosition", "cn;lang-en",
+                "schGrAcInscription", "eduPersonAffiliation",
+                "schacCountryOfCitizenship", "schacPersonalUniqueID",
+                "schacGender", "eduPersonScopedAffiliation",
+                "schacHomeOrganization", "departmentNumber",
+                "eduPersonEntitlement", "givenName;lang-en",
+                "sn", "schGrAcPersonalLinkageID", "givenName;lang-el",
+                "displayName", "mobile", "givenName", "cn"
+        };
         return new EntityMetadata("", "SEAL", this.displayNames, encodedImage,
                 new String[]{""}, "OAUTH 2.0", new String[]{"RM"}, parts,
                 this.endpoints, keyTypes, true, claims,
