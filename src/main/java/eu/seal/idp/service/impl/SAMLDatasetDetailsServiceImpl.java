@@ -14,6 +14,7 @@ import org.opensaml.saml2.core.Attribute;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSAnyImpl;
+import org.opensaml.xml.schema.impl.XSStringImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -63,9 +64,27 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("schacHomeOrganization")) ||
 				(att.getFriendlyName().contains ("eduPersonOrgDN")) 
 					)) {
-				LOG.info ("friendlyName: " + att.getFriendlyName());
-				auxIssuer = getAttributeValuesFromCredential(att.getAttributeValues())[0];
-				break;
+				
+//				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
+//						(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0) &&
+//						(getAttributeValuesFromCredential(att.getAttributeValues())[0] != null)) {
+//					LOG.info ("friendlyName: " + att.getFriendlyName());
+//					
+//					auxIssuer = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+//					
+//					break;
+//				}
+				
+				if ((getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0)) != null) &&
+						(getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0)).length > 0) &&
+						(getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0] != null)) {
+					LOG.info ("friendlyName: " + att.getFriendlyName());
+					LOG.info("valueNEW: " + getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0]);
+					
+					auxIssuer = getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0];
+					
+					break;
+				}
 			}		
 		}
 		
@@ -77,11 +96,20 @@ public class SAMLDatasetDetailsServiceImpl {
 				(att.getFriendlyName().contains ("eduPersonPrincipalName")) 
 					)) {
 				
-				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
-						(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0) &&
-						(getAttributeValuesFromCredential(att.getAttributeValues())[0] != null)) {
+//				if ((getAttributeValuesFromCredential(att.getAttributeValues()) != null) &&
+//						(getAttributeValuesFromCredential(att.getAttributeValues()).length > 0) &&
+//						(getAttributeValuesFromCredential(att.getAttributeValues())[0] != null)) {
+//					LOG.info ("friendlyName: " + att.getFriendlyName());
+//					auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+//					break;
+//				}
+				
+				if ((getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0)) != null) &&
+						(getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0)).length > 0) &&
+						(getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0] != null)) {
 					LOG.info ("friendlyName: " + att.getFriendlyName());
-					auxSubject = getAttributeValuesFromCredential(att.getAttributeValues())[0];
+					LOG.info("valueNEW: " + getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0]);
+					auxSubject = getAttributeValuesFromCredentialNEW(att.getAttributeValues().get(0))[0];
 					break;
 				}
 			}		
@@ -257,6 +285,19 @@ public class SAMLDatasetDetailsServiceImpl {
 		
 		LOG.info("HEY: " + attrSet.toString());
 		return attrSet;
+	}
+	
+	public String[] getAttributeValuesFromCredentialNEW(XMLObject input) {
+		
+		if (input instanceof XSStringImpl) {
+            return (new String[]{((XSStringImpl) input).getValue()});
+        }
+
+        if (input instanceof XSAnyImpl) {
+            return (new String[]{((XSAnyImpl) input).getTextContent()});
+        }
+		
+        return null;
 	}
 	
 	
