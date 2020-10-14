@@ -1,41 +1,30 @@
 package eu.seal.idp.service.impl;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
 import java.util.TimeZone;
 
 import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSAnyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import eu.seal.idp.model.pojo.AttributeSet;
 import eu.seal.idp.model.pojo.AttributeSet.TypeEnum;
 import eu.seal.idp.model.pojo.AttributeSetStatus;
 import eu.seal.idp.model.pojo.AttributeType;
 import eu.seal.idp.model.pojo.DataSet;
-import eu.seal.idp.service.ParameterService;
 
 @Service
 public class SAMLDatasetDetailsServiceImpl {
@@ -67,7 +56,8 @@ public class SAMLDatasetDetailsServiceImpl {
 
 		// The subject identifier, which can be, in this order :
 		// schacPersonalUniqueID, schacPersonalUniqueCode, eduPersonTargetedID, eduPersonPrincipalName, "default-subject"				
-		List<Attribute> attributesList = credential.getAttributes();
+		List<Attribute> attributesList = new ArrayList<Attribute> ();
+		attributesList = credential.getAttributes();
 		for (Attribute att: attributesList) {
 			if ((att.getFriendlyName() != null) && (
 				(att.getFriendlyName().contains ("schacHomeOrganization")) ||
@@ -142,7 +132,8 @@ public class SAMLDatasetDetailsServiceImpl {
         String subjectId = "";
         // In this order:
         // schacPersonalUniqueID, schacPersonalUniqueCode, eduPersonTargetedID, eduPersonPrincipalName, "default-subject" 
-        List<Attribute> attributesList = credential.getAttributes();
+        List<Attribute> attributesList = new ArrayList<Attribute> ();
+		attributesList = credential.getAttributes();
 		for (Attribute att: attributesList) {
 			if ((att.getFriendlyName() != null) && (
 				(att.getFriendlyName().contains ("schacPersonalUniqueID")) ||
@@ -227,9 +218,10 @@ public class SAMLDatasetDetailsServiceImpl {
 			throws UsernameNotFoundException {
 		
 
-		List <AttributeType> attributes = new ArrayList();
+		List <AttributeType> attributes = new ArrayList<AttributeType>();
 		//AttributeType[] attributeTypeArray = new AttributeType[attributes.size()];
-		List<Attribute> attributesList = credential.getAttributes();
+		List<Attribute> attributesList = new ArrayList<Attribute> ();
+		attributesList = credential.getAttributes();
 		
 		for (Attribute att: attributesList) {
 			AttributeType attributeType = new AttributeType();
