@@ -59,30 +59,28 @@ public class SealMetadataServiceImpl implements SealMetadataService {
                 "schacHomeOrganization", "eduPersonTargetedID", "schGrAcPersonID",
                 "uid", "schacGender", "schacYearOfBirth", "schacDateOfBirth",
                 "schacCountryOfCitizenship", "schGrAcPersonSSN", "schacPersonalUniqueID",
-                "eduPersonOrgDN", "mail", "eduPersonAffiliation", "eduPersonAffiliation",
-                "eduPersonScopedAffiliation", "eduPersonPrimaryAffiliation", "givenName", "givenName_en",
-                "givenName_el", "sn", "sn_el", "sn_en", "cn_en", "cn_el", "displayName", "schacPersonalPosition",
-                "schacPersonalUniqueCode", "schGrAcEnrollment", "schGrAcInscription", "schGrAcPersonalLinkageID",
+                "eduPersonOrgDN", "mail", "eduPersonAffiliation",
+                "eduPersonScopedAffiliation", "eduPersonPrimaryAffiliation", "givenName_en",
+                "givenName_el", "sn", "sn_el", "sn_en", "cn_en", "cn_el", "displayName",
+                "schGrAcEnrollment", "schGrAcInscription", "schGrAcPersonalLinkageID",
                 "eduPersonEntitlement",
                 "schGrAcPersonID", "ou", "dc", "schGrAcEnrollment",
-                "eduPersonPrimaryAffiliation", "sn;lang-el",
+                "sn;lang-el",
                 "mailLocalAddress", "sn;lang-en",
                 "cn;lang-el", "eduPersonOrgDN", "schGrAcPersonID",
-                "schacPersonalUniqueCode", "schacYearOfBirth",
+                "schacPersonalUniqueCode",
                 "schacPersonalPosition", "cn;lang-en",
-                "schGrAcInscription", "eduPersonAffiliation",
-                "schacCountryOfCitizenship", "schacPersonalUniqueID",
-                "schacGender", "eduPersonScopedAffiliation",
-                "schacHomeOrganization", "departmentNumber",
+                "schGrAcInscription", "departmentNumber",
                 "eduPersonEntitlement", "givenName;lang-en",
                 "sn", "schGrAcPersonalLinkageID", "givenName;lang-el",
-                "displayName", "mobile", "givenName", "cn"
+                "mobile", "givenName", "cn"
         };
         String[] supportedSigningAlgs= new String[1];
+        String[] supportedEncryptAlgs= new String[1];
         
-        return new EntityMetadata("SEAL", "SEAL", this.displayNames, encodedImage,
+        return new EntityMetadata(System.getenv("IDP_METADATA_URL"), "SEAL", this.displayNames, encodedImage,
                 new String[]{""}, "OAUTH 2.0", new String[]{"RM"}, claims, //parts,
-                this.endpoints, keyTypes, true, claims,
+                this.endpoints, keyTypes, true, supportedEncryptAlgs,
                 true, supportedSigningAlgs, //parts, 
                 null);
         
