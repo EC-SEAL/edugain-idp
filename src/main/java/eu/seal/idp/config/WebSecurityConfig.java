@@ -208,7 +208,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
         webSSOProfileOptions.setIncludeScoping(false);
         
-        webSSOProfileOptions.setNameID(NameIDType.PERSISTENT);
+        //webSSOProfileOptions.setNameID(NameIDType.PERSISTENT);
         
         return webSSOProfileOptions;
     }
