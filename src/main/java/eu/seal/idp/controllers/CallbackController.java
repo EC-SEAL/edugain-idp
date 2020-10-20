@@ -152,7 +152,8 @@ public class CallbackController {
 			String objectId =(new SAMLDatasetDetailsServiceImpl())
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
-			sessionManagerClient.updateDatastore(sessionId, URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()), rtrDataSet);
+			//sessionManagerClient.updateDatastore(sessionId, URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()), rtrDataSet);
+			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
 			
 			if (isAuthenticate)  { // It is an "as/authenticate"
 				LOG.info ("It is an as/authenticate");
@@ -199,7 +200,7 @@ public class CallbackController {
 			String objectId =(new SAMLDatasetDetailsServiceImpl())
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
-			sessionManagerClient.updateDatastore(sessionId, URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()), rtrDataSet);
+			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
 			if (isAuthenticate)  { // It is an "as/authenticate"
 				LOG.info ("It is an as/authenticate");
 				//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet); // NO MORE!

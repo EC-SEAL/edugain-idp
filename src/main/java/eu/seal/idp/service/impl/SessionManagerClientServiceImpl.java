@@ -1,6 +1,8 @@
 package eu.seal.idp.service.impl;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -201,7 +203,7 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
         String stringifiedObject = mapper.writeValueAsString(updateObject);
 
             NewUpdateDataRequest newReq = new NewUpdateDataRequest();
-            newReq.setId(objectId);
+            newReq.setId(URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()));
             newReq.setSessionId(sessionId);
             newReq.setType("dataSet");
             newReq.setData(stringifiedObject);
