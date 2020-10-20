@@ -2,6 +2,8 @@ package eu.seal.idp.controllers;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -150,7 +152,7 @@ public class CallbackController {
 			String objectId =(new SAMLDatasetDetailsServiceImpl())
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
-			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
+			sessionManagerClient.updateDatastore(sessionId, URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()), rtrDataSet);
 			
 			if (isAuthenticate)  { // It is an "as/authenticate"
 				LOG.info ("It is an as/authenticate");
@@ -197,7 +199,7 @@ public class CallbackController {
 			String objectId =(new SAMLDatasetDetailsServiceImpl())
 					.getUniqueIdFromCredentials(credentials);  // Calculate eduPersonTargetedIdentifier SHA1
 			
-			sessionManagerClient.updateDatastore(sessionId, objectId, rtrDataSet);
+			sessionManagerClient.updateDatastore(sessionId, URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()), rtrDataSet);
 			if (isAuthenticate)  { // It is an "as/authenticate"
 				LOG.info ("It is an as/authenticate");
 				//sessionManagerClient.updateSessionVariables(sessionId, sessionId,"authenticationSet", authSet); // NO MORE!
