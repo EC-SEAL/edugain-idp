@@ -203,7 +203,8 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
         String stringifiedObject = mapper.writeValueAsString(updateObject);
 
             NewUpdateDataRequest newReq = new NewUpdateDataRequest();
-            newReq.setId(URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()));
+            //newReq.setId(URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()));
+            newReq.setId(objectId);
             newReq.setSessionId(sessionId);
             newReq.setType("dataSet");
             newReq.setData(stringifiedObject);
