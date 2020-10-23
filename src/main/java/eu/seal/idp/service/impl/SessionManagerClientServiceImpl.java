@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.seal.idp.model.pojo.RequestParameters;
 import eu.seal.idp.model.pojo.NewUpdateDataRequest;
 import eu.seal.idp.model.pojo.SessionMngrResponse;
 import eu.seal.idp.model.pojo.UpdateDataRequest;
@@ -147,28 +148,6 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
             return "error";
         }
         
-        /*
-        LOG.info("session " + sessionId + " updated LEGACY API Session succesfully  with user attributes " + stringifiedObject);
-
-        if (variableName.equals("dsResponse")) {
-            NewUpdateDataRequest newReq = new NewUpdateDataRequest();
-            newReq.setId(objectId);
-            newReq.setSessionId(sessionId);
-            newReq.setType("dataSet");
-            newReq.setData(stringifiedObject);
-            String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
-            
-            System.out.println("Result" + result);
-            resp = mapper.readValue(result, SessionMngrResponse.class);
-            LOG.info("updateSessionData " + resp.getCode().toString());
-            if (!resp.getCode().toString().equals("OK")) {
-                LOG.error("ERROR: " + resp.getError());
-                return "error";
-            }
-            LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
-        }
-        */
-
         return "ok";
     }
 	
@@ -181,13 +160,18 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
 	 */	
 	
 	public Object getDataStore(String sessionId, String type) throws NoSuchAlgorithmException, IOException {
-		
+		String contentType="application/json";
 		String sessionMngrUrl = System.getenv("SESSION_MANAGER_URL");
-		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-		requestParams.add(new NameValuePair("sessionId", sessionId));
-		requestParams.add(new NameValuePair("type", type));
+//		List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+//		requestParams.add(new NameValuePair("sessionId", sessionId));
+//		requestParams.add(new NameValuePair("type", type));
 		
-		SessionMngrResponse rsp = netServ.sendGetSMResponse(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+		RequestParameters requestParameters = new RequestParameters();
+        requestParameters.setSessionId(sessionId);
+        requestParameters.setType(type);
+		
+		//SessionMngrResponse rsp = netServ.sendGetSMResponse(sessionMngrUrl, "/sm/new/get",requestParams, 1);
+        SessionMngrResponse rsp = netServ.sendPostBodySMResponse(sessionMngrUrl, "/sm/new/get", requestParameters, contentType, 1);
 		
 		LOG.info("dataStore: " + rsp.getAdditionalData());
 		return rsp.getAdditionalData();
@@ -201,17 +185,20 @@ public class SessionManagerClientServiceImpl implements SessionManagerClientServ
 	public String updateDatastore(String sessionId, String objectId, Object updateObject) throws IOException, NoSuchAlgorithmException {
         ObjectMapper mapper = new ObjectMapper();
         String stringifiedObject = mapper.writeValueAsString(updateObject);
+        
+        String contentType="application/json";
 
-            NewUpdateDataRequest newReq = new NewUpdateDataRequest();
-            //newReq.setId(URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()));
-            newReq.setId(objectId);
-            newReq.setSessionId(sessionId);
-            newReq.setType("dataSet");
-            newReq.setData(stringifiedObject);
-            String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
+        NewUpdateDataRequest newReq = new NewUpdateDataRequest();
+        //newReq.setId(URLEncoder.encode(objectId, StandardCharsets.UTF_8.toString()));
+        newReq.setId(objectId);
+        newReq.setSessionId(sessionId);
+        newReq.setType("dataSet");
+        newReq.setData(stringifiedObject);
+        //String result = netServ.sendNewPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, "application/json", 1);
+        String result = netServ.sendPostBody(sessionMngrURL, URIUPDATENEWSESSION, newReq, contentType, 1);
             
-            LOG.info("Result" + result);          
-            LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
+        LOG.info("Result" + result);          
+        LOG.info("session " + sessionId + " updated NEW API Session succesfully  with objectID" + objectId + "  with user attributes " + stringifiedObject);
 
         return "ok";
     }
