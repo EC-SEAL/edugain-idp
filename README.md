@@ -21,8 +21,7 @@ The following environmental variables need to be set prior to running the projec
 | SESSION_MANAGER_URL| 
 | KEYSTORE_PATH   |
 | JWT_CERT_ALIAS   |
-| *KEYSTORE_PASS    |
-| *KEYSTORE_ID      |
+| KEY_PASS    |
 | TESTING          |
 | SAML_KEYSTORE_PATH |
 | SAML_KEYSTORE_PASS |
@@ -33,6 +32,8 @@ The following environmental variables need to be set prior to running the projec
 | CL_RESPONSE_RECEIVER_ID |
 | RM_RESPONSE_RECEIVER_ID |
 | IDP_METADATA_URL=https://eid-proxy.aai-dev.grnet.gr/Saml2IDP/proxy.xml |
+| SAML_ENTITY_ID=saml-test at vm.project-seal.eu deployment|
+
 
 
 
