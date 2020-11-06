@@ -150,7 +150,7 @@ public class SAMLDatasetDetailsServiceImpl {
         String nowDate = formatter.format(date);
 		DataSet dataSet = new DataSet();
 		dataSet.setId(id);
-        dataSet.setIssuerId("issuerEntityId");
+        //dataSet.setIssuerId("issuerEntityId");
         dataSet.setIssued(nowDate);
         dataSet.setType("eduGAIN");
         
@@ -195,6 +195,7 @@ public class SAMLDatasetDetailsServiceImpl {
 		}
         if (auxIssuer == null || auxIssuer.length() == 0)
 			auxIssuer = credential.getRemoteEntityID();
+        dataSet.setIssuerId(auxIssuer);
         
         AttributeType issuerAttr = new AttributeType();
 		issuerAttr.setName("issuerEntityId");
